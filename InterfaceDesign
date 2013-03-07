@@ -1,18 +1,28 @@
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-*********              Rules:                 ********
+*********           Commandments:             ********
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	Rules. Anyone found in violation of the folowing statutes will be summarily executed.
+	Anyone found in violation of the folowing statutes will be summarily executed.
 
-	1. 1 Tab, not spaces
-	2. Don't use i, j, k
-	3. Camel case
-	4. When in doubt, comment.
-	5. Always use override decorator
-	6. Multiline comment docstrings
-	7. When in doubt, use protected
-	8. Use constants.
-	9. Do not push untested or not working code to github.
-	10. Specify orders of growth for all your functions.
+	Formatting and Readability
+	--------------------------
+		1. 1 Tab, not spaces
+		2. Don't use i, j, k
+		3. Use Camel case
+		4. When in doubt, comment.
+		5. Multiline comment docstrings
+		6. Specify orders of growth for all your functions.
+	
+	Coding Style
+	------------
+		1. Always use override decorator
+		2. When in doubt, use protected
+		3. Use constants when available, not values.
+		4. Abstraction!
+
+	Github and Collaboration
+	------------------------
+		1. Do not push untested or disfunctional code to github.
+		2. Push and test often if editing shared file like Constants
 
 
 
@@ -22,7 +32,13 @@
 
 Constants
 =========
-	class Constants{
+	/**
+	 *
+	 *	Global class contining constants that will be
+	 *	used throughout the project.
+	 *
+	**/
+	public final class Constants{
 		//Board Constants
 		public static final BOARDHEIGHT=8;
 		public static final BOARDWIDTH=8;
@@ -42,24 +58,37 @@ Constants
 
 Board Module
 ============
+	/**
+	 *	
+	 *	Board represents a single game state. It knows the 
+	 *	position of each chip, and enforces the rules of the 
+	 *	game, throwing an exception whenever a rule violation
+	 *	is encountered.
+	 *	
+	 *	Invariants:
+	 *  	1. Will throw an exception if a move is illegal.
+	 *  	2. No two chips in any given place.
+	 *  	3. Cannot be three chips adjacent to each other.
+	 *  	4. Cannot place more than 10 chips of the same color.
+	 *  	5. No chips in wrong goals.
+	 *  	6. No chips in corners.
+	 *	
+	**/
 	public class Board{
-		/**
-		 *	
-		 *	Invariants:
-		 *  	1. Will throw an exception if a move is illegal.
-		 *  	2. No two chips in any given place.
-		 *  	3. Cannot be three chips adjacent to each other.
-		 *  	4. Cannot place more than 10 chips of the same color.
-		 *  	5. No chips in wrong goals.
-		 *  	6. No chips in corners.
-		 *	
-		**/
 		public Board();
 		public void moveChip(Chip c) throws InvalidChipException;
 		public void addChip(int x, int y) throws InvalidChipException;
 		public Chip getChip(int x, int y) throws ChipNotFoundException;
+		public boolean hasChip(int x, int y);
 		public int isGameOver();
 	}
+
+	/**
+	 *
+	 *	The chip ADT represents a single chip on the board.
+	 *	Each chip knows its position on the board.
+	 *
+	**/
 	public class Chip{
 		public Chip(Board b) throws InvalidChipException;
 		public int getX();
@@ -70,25 +99,42 @@ Board Module
 		public int getNeighbors();
 		public int getDistance();
 	}
+
+	/**
+	 *
+	 *	An exception thrown when a player attempts to create a chip at an invalid location
+	 *
+	**/
 	public class InvalidChipException extends Exception{
 		public InvalidChipException(String s, int x, int y);
 	}
+
+	/**
+	 *
+	 *	An exception thrown when a player attemps to get a chip not on the board
+	 *
+	**/
 	public class ChipNotFoundException extends Exception{
 		public ChipNotFoundException(String s, int x, int y);
 	}
 
 AI Module
 =========
+	/**
+	 *
+	 *	MachinePlayer represents an instance of our AI.
+	 *
+	 *	Invariants:
+	 *  	1. Does not make illegal moves
+	 *  
+	**/
 	public class MachinePlayer extends Player{
-		/**
-		 *  
-		 *	Invariants:
-		 *  	1. Does not make illegal moves
-		 *  
-		**/
 		public MachinePlayer();
+		@Override
 		public Move chooseMove();
+		@Override
 		public Move opponentMove(Move m);
+		@Override
 		public void forceMove();
 	}
 
@@ -96,6 +142,10 @@ Referee
 =======
 	public class Referee extends Player{
 		/**
+		 *  
+		 *	Referee is a player that enforces the rules, and
+		 *	awards wins in the event of the game ending
+		 *	or a rules violation.
 		 *  
 		 *	Invariants:
 		 *  	1. Does not change the board
