@@ -1,0 +1,108 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*********              Rules:                 ********
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	Rules. Anyone found in violation of the folowing statutes will be summarily executed.
+
+	1. 1 Tab, not spaces
+	2. Don't use i, j, k
+	3. Camel case
+	4. When in doubt, comment.
+	5. Always use override decorator
+	6. Multiline comment docstrings
+	7. When in doubt, use protected
+	8. Use constants.
+	9. Do not push untested or not working code to github.
+	10. Specify orders of growth for all your functions.
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*********          Interface Design           ********
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Constants
+=========
+	class Constants{
+		//Board Constants
+		public static final BOARDHEIGHT=8;
+		public static final BOARDWIDTH=8;
+
+		//Player Constants
+		public static final NULL_PLAYER=1;
+		public static final BLACK=1;
+		public static final WHITE=2;
+
+		//Game Constants
+		public static final MAX_CHIPS=10;
+
+		//Debugging and misc.
+		public static final DEBUG=true;
+		public static final void print(Object o);
+	}
+
+Board Module
+============
+	public class Board{
+		/**
+		 *	
+		 *	Invariants:
+		 *  	1. Will throw an exception if a move is illegal.
+		 *  	2. No two chips in any given place.
+		 *  	3. Cannot be three chips adjacent to each other.
+		 *  	4. Cannot place more than 10 chips of the same color.
+		 *  	5. No chips in wrong goals.
+		 *  	6. No chips in corners.
+		 *	
+		**/
+		public Board();
+		public void moveChip(Chip c) throws InvalidChipException;
+		public void addChip(int x, int y) throws InvalidChipException;
+		public Chip getChip(int x, int y) throws ChipNotFoundException;
+		public int isGameOver();
+	}
+	public class Chip{
+		public Chip(Board b) throws InvalidChipException;
+		public int getX();
+		public int getY();
+		public int getColor();
+		public boolean isLOS(Chip c);
+		public boolean isBetween(Chip c, Chip d);
+		public int getNeighbors();
+		public int getDistance();
+	}
+	public class InvalidChipException extends Exception{
+		public InvalidChipException(String s, int x, int y);
+	}
+	public class ChipNotFoundException extends Exception{
+		public ChipNotFoundException(String s, int x, int y);
+	}
+
+AI Module
+=========
+	public class MachinePlayer extends Player{
+		/**
+		 *  
+		 *	Invariants:
+		 *  	1. Does not make illegal moves
+		 *  
+		**/
+		public MachinePlayer();
+		public Move chooseMove();
+		public Move opponentMove(Move m);
+		public void forceMove();
+	}
+
+Referee
+=======
+	public class Referee extends Player{
+		/**
+		 *  
+		 *	Invariants:
+		 *  	1. Does not change the board
+		 *  	2. Does not allow illegal moves
+		 *  
+		**/
+		public boolean isValidBoard(Board b);
+		public int getWinner(Board b);
+		public int isGameOver(Board b);
+	}
