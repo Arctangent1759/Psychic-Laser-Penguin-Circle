@@ -167,30 +167,19 @@ Board Module
 
 		/**
 		 *
-		 *	
+		 *	Constructs a new chip on board b.
+		 *	@param b specifies the board that the chip belongs to
+		 *	@throws InvalidChipException when 
 		 *
 		**/
-		public Chip(Board b) throws InvalidChipException;
+		public Chip(Board b, color c) throws InvalidChipException;
 
 		/**
 		 *
 		 *	
 		 *
 		**/
-		public int getX();
 
-		/**
-		 *
-		 *	
-		 *
-		**/
-		public int getY();
-
-		/**
-		 *
-		 *	
-		 *
-		**/
 		public int getColor();
 
 		/**
@@ -199,6 +188,12 @@ Board Module
 		 *
 		**/
 		public boolean isLOS(Chip c);
+
+		/**
+		 *
+		 *	
+		 *
+		**/
 		public boolean isBetween(Chip c, Chip d);
 
 		/**
@@ -208,12 +203,6 @@ Board Module
 		**/
 		public int getNeighbors();
 
-		/**
-		 *
-		 *	
-		 *
-		**/
-		public int getDistance();
 	}
 
 	/**
