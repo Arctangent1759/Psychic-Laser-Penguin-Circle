@@ -264,34 +264,41 @@ AI Module
 
 		/**
 		 *
-		 *	
-		 *
+		 * Constructs a MachinePlayer with an AI for the game.
+		 * @param b The board in which this MachinePlayer belongs to.
+		 * @param c The color of which this MachinePlayer is.
 		**/
-		public MachinePlayer();
+		public MachinePlayer(Board b, Color c);
 
 		/**
 		 *
-		 *	
-		 *
+		 * Decides what move is the best possible move.
+		 * Uses alpha-beta pruning with an algorithm determining how far 
+		 * the AI will search.
+		 * @return The best possible move based on the AI.
 		**/
 		@Override
 		public Move chooseMove();
 
 		/**
 		 *
-		 *	
-		 *
+		 * Updates the current status of the internal board if the opponent move is legal.
+		 * If move is illegal, nothing is done to the internal status of the board.
+		 * Enforces invariant that the move was the opponent is not illegal when calculating "this" move.
+		 * @return boolean indicating whether opponent Move m is legal or not.
 		**/
 		@Override
-		public Move opponentMove(Move m);
+		public boolean opponentMove(Move m);
 
 		/**
 		 *
-		 *	
-		 *
+		 * Updates the current status of the internal board if the "this" player move is legal.
+		 * If move is illegal, nothing is done to the internal status of the board.
+		 * Enforces the invariant that move made is not illegal.
+		 * @return boolean indicating whether opponent Move m is legal or not.
 		**/
 		@Override
-		public void forceMove();
+		public boolean forceMove(Move m);
 	}
 
 Referee
