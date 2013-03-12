@@ -172,11 +172,12 @@ Board Module
 		 *	@throws InvalidChipException when 
 		 *
 		**/
-		public Chip(Board b, color c) throws InvalidChipException;
+		public Chip(Board b, color c, int x, int y) throws InvalidChipException;
 
 		/**
 		 *
-		 *	
+		 *	Get the color of the chip
+		 *	@return the color of the chip, defined in Constants
 		 *
 		**/
 
@@ -184,24 +185,30 @@ Board Module
 
 		/**
 		 *
-		 *	
+		 *	Returns whether this chip is line of sight with Chip c
+		 *	@param c is the chip for comparison
+		 *	@return whether the chip is line of sight with c
 		 *
 		**/
 		public boolean isLOS(Chip c);
 
 		/**
 		 *
-		 *	
+		 *	Returns whether this chip is between chips c and d.
+		 *	@param c the first chip
+		 *	@param c the second chip
+		 *	@return whether this chip is between c and d.
 		 *
 		**/
 		public boolean isBetween(Chip c, Chip d);
 
 		/**
 		 *
-		 *	
+		 *	Returns the number of same-color neighbors this chip has.
+		 *	@returns the number of neighbors of this chip's color.
 		 *
 		**/
-		public int getNeighbors();
+		public int getSameColorNeighbors();
 
 	}
 
@@ -214,7 +221,10 @@ Board Module
 
 		/**
 		 *
-		 *	
+		 *	Constructs an InvalidChipException
+		 *	@param s the message of the exception
+		 *	@param x the x coordinate of the invalid chip
+		 *	@param y the y coordinate of the invalid chip
 		 *
 		**/
 		public InvalidChipException(String s, int x, int y);
@@ -229,7 +239,10 @@ Board Module
 
 		/**
 		 *
-		 *	
+		 *	Constructs a ChipNotFoundException
+		 *	@param s the message of the exception
+		 *	@param x the x coordinate of the invalid chip query
+		 *	@param y the y coordinate of the invalid chip query
 		 *
 		**/
 		public ChipNotFoundException(String s, int x, int y);
@@ -244,7 +257,10 @@ Board Module
 
 		/**
 		 *
-		 *	
+		 *	Constructs a IllegalChipMoveException
+		 *	@param s the message of the exception
+		 *	@param x the x coordinate of the invalid chip move
+		 *	@param y the y coordinate of the invalid chip move
 		 *
 		**/
 		public IllegalChipMoveException(String s, int x, int y);
