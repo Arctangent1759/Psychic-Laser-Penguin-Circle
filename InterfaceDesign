@@ -172,11 +172,12 @@ Board Module
 		 *	@throws InvalidChipException when 
 		 *
 		**/
-		public Chip(Board b, color c) throws InvalidChipException;
+		public Chip(Board b, color c, int x, int y) throws InvalidChipException;
 
 		/**
 		 *
-		 *	
+		 *	Get the color of the chip
+		 *	@return the color of the chip, defined in Constants
 		 *
 		**/
 
@@ -184,24 +185,30 @@ Board Module
 
 		/**
 		 *
-		 *	
+		 *	Returns whether this chip is line of sight with Chip c
+		 *	@param c is the chip for comparison
+		 *	@return whether the chip is line of sight with c
 		 *
 		**/
 		public boolean isLOS(Chip c);
 
 		/**
 		 *
-		 *	
+		 *	Returns whether this chip is between chips c and d.
+		 *	@param c the first chip
+		 *	@param c the second chip
+		 *	@return whether this chip is between c and d.
 		 *
 		**/
 		public boolean isBetween(Chip c, Chip d);
 
 		/**
 		 *
-		 *	
+		 *	Returns the number of same-color neighbors this chip has.
+		 *	@returns the number of neighbors of this chip's color.
 		 *
 		**/
-		public int getNeighbors();
+		public int getSameColorNeighbors();
 
 	}
 
@@ -214,7 +221,10 @@ Board Module
 
 		/**
 		 *
-		 *	
+		 *	Constructs an InvalidChipException
+		 *	@param s the message of the exception
+		 *	@param x the x coordinate of the invalid chip
+		 *	@param y the y coordinate of the invalid chip
 		 *
 		**/
 		public InvalidChipException(String s, int x, int y);
@@ -229,7 +239,10 @@ Board Module
 
 		/**
 		 *
-		 *	
+		 *	Constructs a ChipNotFoundException
+		 *	@param s the message of the exception
+		 *	@param x the x coordinate of the invalid chip query
+		 *	@param y the y coordinate of the invalid chip query
 		 *
 		**/
 		public ChipNotFoundException(String s, int x, int y);
@@ -244,7 +257,10 @@ Board Module
 
 		/**
 		 *
-		 *	
+		 *	Constructs a IllegalChipMoveException
+		 *	@param s the message of the exception
+		 *	@param x the x coordinate of the invalid chip move
+		 *	@param y the y coordinate of the invalid chip move
 		 *
 		**/
 		public IllegalChipMoveException(String s, int x, int y);
@@ -317,23 +333,25 @@ Referee
 		**/
 
 		/**
-		 *
-		 *	
-		 *
+		 *	Checks to see if board is valid based on invariants.
+		 *	@param Board b, the board given by the players.
+		 *	@return whether the board follows the invariants or not.
 		**/
 		public boolean isValidBoard(Board b);
 
 		/**
-		 *
-		 *	
-		 *
+		 *	Determines who wins the game.
+		 *	A player wins the game if he has a network of 8 chips from one end 
+		 *	of the goal  to the other end of the the goal. 
+		 *	@param Board b, the board given by the players.
+		 *	@return the winner of the game. Can return an error.
 		**/
 		public int getWinner(Board b);
 
 		/**
-		 *
-		 *	
-		 *
+		 *	Determines if the game is over or not.
+		 *	@param Board b, the board given by the players
+		 *	@return whether the game is over or not. If not, continue the game.
 		**/
 		public int isGameOver(Board b);
 	}
