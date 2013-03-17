@@ -35,8 +35,14 @@ public class Board{
 	 *	@param x The x coordinate of the chip's destination.
 	 *	@param y The y coordinate of the chip's destination.
 	**/
-	public void moveChip(Chip c, int x, int y) {
-	
+	public void moveChip(Chip c, int x, int y) throws InvalidChipException{
+		board[c.xPos][c.yPos] = null;
+		if(hasChip(board[x][y]) == false){
+			board[x][y] = new Chip(this,c.color,x,y);
+		}
+		else{
+			throw InvalidChipException;
+		}
 	}
 	/**
 	 *
@@ -48,7 +54,26 @@ public class Board{
 	 *			chip, in the wrong goal, or three in a row).
 	 *
 	**/
-	public void addChip(int x, int y) throws InvalidChipException;
+	public void addChip(int color, int x, int y) throws InvalidChipException{
+		if(hasChip(board[x][y])){
+			board[x][y] = new Chip(this,c.color,x,y);
+		}
+		else{
+			throw InvalidChipException
+		}
+	}
+	/**
+	 *
+	 *	removes the chip at x,y.
+	 *	@param x the target x coordinate
+	 *	@param y the target y coordinate
+	 *	@return nothing.
+	 *
+	**/
+	public void removeChip(Chip c){
+		if(hasChip())
+		board[c.xPos()][c.yPos()] = null;
+	}
 	/**
 	 *
 	 *	Gets the chip at x,y.
@@ -58,7 +83,12 @@ public class Board{
 	 *	@return the Chip at x,y
 	 *
 	**/
-	public Chip getChip(int x, int y) throws ChipNotFoundException;
+	public Chip getChip(int x, int y) throws ChipNotFoundException{
+		if(!hasChip(x,y)){
+			throw ChipNotFoundException;
+		}
+		return board[x][y];
+	}
 	/**
 	 *
 	 *	Tells whether a chip at x,y exists
@@ -67,7 +97,12 @@ public class Board{
 	 *	@return whether there is a chip at x,y
 	 *
 	**/
-	public boolean hasChip(int x, int y);
+	public boolean hasChip(int x, int y){
+		if (board[x][y] instanceof Chip){
+			return true;
+		}
+		return false;
+	}
 	/**
 	 *
 	 *	Returns whether this chip is line of sight with Chip c
