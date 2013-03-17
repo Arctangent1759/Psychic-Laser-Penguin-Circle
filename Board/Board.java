@@ -70,13 +70,14 @@ public class Board{
 	public boolean hasChip(int x, int y);
 	/**
 	 *
-	 *	Returns whether this chip is line of sight with Chip c
-	 *	@param c is the chip for comparison
-	 *	@return whether the chip is line of sight with c
+	 *	Returns whether this Chip a is line of sight with Chip b
+	 *	@param a is the chip of reference.
+	 *	@param b is the chip for comparison
+	 *	@return whether the chip is line of sight with b
 	 *
 	**/
 	public boolean isLOS(Chip a, Chip b) {
-		if (isTopBottom(a,b) || isLeftRight(a,b) || isLeftDiagonal(a,b) || isRightDiagonal(a,b)) {
+		if (isTopBottom(a,b) || isLeftRight(a,b) || isDiagonal(a,b)) {
 			return true;
 		}
 		return false;
@@ -97,25 +98,72 @@ public class Board{
 	}
 	
 	private boolean isLeftDiagonal(Chip a, Chip b) {
-		int index = 0;
-		while (index + xPos() < Constants.WIDTH) {
-		
+		if (b.xPos() - a.xPos() == 0) {
+			return false;
+		}
+		else {
+			double slope = (b.yPos()-a.yPos()) / (b.xPos() - a.xPos()); 
+			if (slope == -1) {
+				return true;
+			}
+			return false;
 		}
 	}
 	
-	private boolean isRightDiagonal(Chip c) {
-	
+	private boolean isRightDiagonal(Chip a, Chip b) {
+		if (b.xPos() - a.xPos() == 0) {
+				return false;
+		}
+		else {
+			double slope = (b.yPos()-a.yPos()) / (b.xPos() - a.xPos()); 
+			if (slope == 1) {
+				return true;
+			}
+			return false;
+		}
 	}
+	
 	/**
 	 *
-	 *	Returns whether this chip is between chips c and d.
-	 *	@param c the first chip
-	 *	@param c the second chip
-	 *	@return whether this chip is between c and d.
+	 *	Returns whether chip a is between chips b and c.
+	 *	@param a the reference chip
+	 *	@param b the second chip
+	 *	@param c the third chip
+	 *	@return whether this chip is between a and b.
 	 *
 	**/
-	public boolean isBetween(Chip c, Chip d) {
-	
+	public boolean isBetween(Chip a, Chip b, Chip c) {
+		if (isTopBottom(a,b) && isTopBottom(b,c)) {
+			if ( (b.yPos()-a.yPos() < 0 && c.yPos()-a.yPos() > 0) 
+				|| (b.yPos()-a.yPos() > 0 && c.yPos()-a.yPos() < 0)) {
+				return true;
+			}
+			return false;
+		}
+		else if (isLeftRight(a,b) && isLeftRight(b,c)) {
+			if ( (b.xPos()-a.xPos() < 0 && c.xPos()-a.xPos() > 0) 
+				|| (b.xPos()-a.xPos() > 0 && c.xPos()-a.xPos() < 0)) {
+				return true;
+			}
+			return false;
+		}
+		
+		else if (isLeftDiagonal(a,b) && isLeftDiagonal(b,c)) {
+			if ( (b.xPos()-a.xPos() < 0 && c.xPos()-a.xPos() > 0) 
+				|| (b.xPos()-a.xPos() > 0 && c.xPos()-a.xPos() < 0)) {
+				return true;
+			}
+			return false;
+		}
+		
+		else if (isRightDiagonal(a,b) && isRightDiagonal(b,c)) {
+			if ( (b.xPos()-a.xPos() < 0 && c.xPos()-a.xPos() > 0) 
+				|| (b.xPos()-a.xPos() > 0 && c.xPos()-a.xPos() < 0)) {
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 	/**
 	 *
@@ -124,7 +172,7 @@ public class Board{
 	 *
 	**/
 	public int getSameColorNeighbors() {
-	
+		return 0;
 	}
 	/**
 	 *
