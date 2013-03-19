@@ -1,10 +1,7 @@
-                                                                     
-                                             
 /**
  *	Board represents a single game state. It knows the 
  *	position of each chip, and enforces the rules of the 
- *	game, throwing an exception whenever a rule violation
- *	is encountered.
+ *	game, becoming "invalid" when a violation is reached.
  *	
  *	Invariants:
  *  	1. Will throw an exception if a move is illegal.
@@ -16,17 +13,21 @@
  *	
 **/
 
+
 public class Board{	
+
+
 	/**
 	 *
 	 *	Constructs a new Board.
 	 *
 	**/
-	public int[][] board;
+	protected Chip[][] grid;
 	
 	public Board() {
-		board = new int[Constants.BOARDWIDTH][Constants.BOARDHEIGHT];
+		grid = new Chip[Constants.BOARDWIDTH][Constants.BOARDHEIGHT];
 	}
+
 
 	/**
 	 *
@@ -34,46 +35,56 @@ public class Board{
 	 *	@param c The chip to be moved.
 	 *	@param x The x coordinate of the chip's destination.
 	 *	@param y The y coordinate of the chip's destination.
+	 *
 	**/
-	public void moveChip(Chip c, int x, int y) throws InvalidChipException{
-		board[c.xPos][c.yPos] = null;
-		if(hasChip(board[x][y]) == false){
-			board[x][y] = new Chip(this,c.color,x,y);
+	public void moveChip(int x1, int y1, int x2, int y2) throws InvalidMoveException{
+
+		//Make sure there's a chip at (x1,y1)
+		if (!hasChip(x1,y1)){
+			throw new InvalidMoveException("No chip to move from (" + x1 + "," + y1 + ") to (" + x2 + "," + y2 + ").");
 		}
-		else{
-			throw InvalidChipException;
+
+		//Verify that the chip is only being moved 1 step orthogonally or diagonally
+		if (Math.abs(x1-x2)!=1 || Math.abs(y1-y2)!=1){
+			throw new InvalidMoveException("No chip to move from (" + x1 + "," + y1 + ") to (" + x2 + "," + y2 + ").");
 		}
+
+		//Get the chip at (x1,y1)'s color
+		int currColor = getChip(x1,x2).getColor();
+
+		//Copy the chip to (x2,y2). If doing so throws an exception 
+		//(x2,y2 is occupied, for instace), the exception is passed 
+		//to caller.
+		addChip(currColor,x2,y2);
+		grid[x1][y1]=null;
 	}
+
+
 	/**
 	 *
 	 *	Creates chip at x,y.
 	 *	@param x the destination x coordinate
 	 *	@param y the destination y coorinate
-	 *	@throws InvalidChipException if the chip is added
-	 *			in an illegal location (on top of another
-	 *			chip, in the wrong goal, or three in a row).
 	 *
 	**/
-	public void addChip(int color, int x, int y) throws InvalidChipException{
-		if(hasChip(board[x][y])){
-			board[x][y] = new Chip(this,c.color,x,y);
+	public void addChip(int color, int x, int y) throws InvalidMoveException{
+		//Enforce chip placement rule 3
+		if (hasChip(x,y)){
+			throw new InvalidMoveException("There is already a chip at (" + x+","+y+").");
 		}
-		else{
-			throw InvalidChipException
+
+		//Create the new chip
+		grid[x][y]=new Chip(color);
+
+		//Enforce chip placement rules 1, 2, and 4. These are rules dependent on board state.
+		if (!isValid()){
+			grid[x][y]=null; //Revert the board if the move invalidates the board.
+			throw new InvalidMoveException("Placement rule violated.");
 		}
 	}
-	/**
-	 *
-	 *	removes the chip at x,y.
-	 *	@param x the target x coordinate
-	 *	@param y the target y coordinate
-	 *	@return nothing.
-	 *
-	**/
-	public void removeChip(Chip c){
-		if(hasChip())
-		board[c.xPos()][c.yPos()] = null;
-	}
+
+
+
 	/**
 	 *
 	 *	Gets the chip at x,y.
@@ -83,12 +94,11 @@ public class Board{
 	 *	@return the Chip at x,y
 	 *
 	**/
-	public Chip getChip(int x, int y) throws ChipNotFoundException{
-		if(!hasChip(x,y)){
-			throw ChipNotFoundException;
-		}
-		return board[x][y];
+	public Chip getChip(int x, int y){
+		return grid[x][y];
 	}
+
+
 	/**
 	 *
 	 *	Tells whether a chip at x,y exists
@@ -98,10 +108,7 @@ public class Board{
 	 *
 	**/
 	public boolean hasChip(int x, int y){
-		if (board[x][y] instanceof Chip){
-			return true;
-		}
-		return false;
+		return grid[x][y]!=null;
 	}
 	/**
 	 *
@@ -111,108 +118,285 @@ public class Board{
 	 *	@return whether the chip is line of sight with b
 	 *
 	**/
-	public boolean isLOS(Chip a, Chip b) {
-		if (isTopBottom(a,b) || isLeftRight(a,b) || isDiagonal(a,b)) {
-			return true;
-		}
-		return false;
-	}
-	
-	private boolean isTopBottom(Chip a, Chip b) {
-		if (a.xPos() == b.xPos()) {
-			return true;
-		}
-		return false;
-	}
-	
-	private boolean isLeftRight(Chip a, Chip b) {
-		if (a.yPos() == b.yPos()) {
-			return true;
-		}
-		return false;
-	}
-	
-	private boolean isLeftDiagonal(Chip a, Chip b) {
-		if (b.xPos() - a.xPos() == 0) {
-			return false;
-		}
-		else {
-			double slope = (b.yPos()-a.yPos()) / (b.xPos() - a.xPos()); 
-			if (slope == -1) {
-				return true;
-			}
-			return false;
-		}
-	}
-	
-	private boolean isRightDiagonal(Chip a, Chip b) {
-		if (b.xPos() - a.xPos() == 0) {
-				return false;
-		}
-		else {
-			double slope = (b.yPos()-a.yPos()) / (b.xPos() - a.xPos()); 
-			if (slope == 1) {
-				return true;
-			}
-			return false;
-		}
+	public boolean isLOS(int x1,int x2,int y1,int y2) {
+		return !(x1==x2 || y1==y2 || Math.abs((y2-y1)/(x2-x1))==1);
 	}
 	
 	/**
 	 *
-	 *	Returns whether chip a is between chips b and c.
-	 *	@param a the reference chip
-	 *	@param b the second chip
-	 *	@param c the third chip
-	 *	@return whether this chip is between a and b.
+	 *	Returns whether chip 1 interrupts the path between chips 2 and 3.
+	 *	@param x1, y1 the reference chip
+	 *	@param x2, y2 the second chip
+	 *	@param x3, y3 the third chip
+	 *	@return whether this chip is between 2 and 3.
 	 *
 	**/
-	public boolean isBetween(Chip a, Chip b, Chip c) {
-		if (isTopBottom(a,b) && isTopBottom(b,c)) {
-			if ( (b.yPos()-a.yPos() < 0 && c.yPos()-a.yPos() > 0) 
-				|| (b.yPos()-a.yPos() > 0 && c.yPos()-a.yPos() < 0)) {
-				return true;
-			}
+	public boolean isInterruptPath(int x1, int y1, int x2, int y2, int x3, int y3) {
+		//If 2 and 3 do not form a valid Network path, then no interruption occurs.
+		if (!isLOS(x2,y2,x3,y3)){
 			return false;
 		}
-		else if (isLeftRight(a,b) && isLeftRight(b,c)) {
-			if ( (b.xPos()-a.xPos() < 0 && c.xPos()-a.xPos() > 0) 
-				|| (b.xPos()-a.xPos() > 0 && c.xPos()-a.xPos() < 0)) {
-				return true;
-			}
+
+		//Check if 1 is in the rectangle bounded by 2 and 3.
+		if (!(((x1 > x2 && x1 < x3) || (x1 > x3 && x1 < x2)) && (y1 > y2 && y1 < y3) || (y1 > y3 && y1 < y2))){
 			return false;
 		}
-		
-		else if (isLeftDiagonal(a,b) && isLeftDiagonal(b,c)) {
-			if ( (b.xPos()-a.xPos() < 0 && c.xPos()-a.xPos() > 0) 
-				|| (b.xPos()-a.xPos() > 0 && c.xPos()-a.xPos() < 0)) {
-				return true;
-			}
-			return false;
-		}
-		
-		else if (isRightDiagonal(a,b) && isRightDiagonal(b,c)) {
-			if ( (b.xPos()-a.xPos() < 0 && c.xPos()-a.xPos() > 0) 
-				|| (b.xPos()-a.xPos() > 0 && c.xPos()-a.xPos() < 0)) {
-				return true;
-			}
-			return false;
-		}
-		return false;
+
+		//Check 1 is on the path between 2 and 3.
+		return y1==y2+(Math.abs((y2-y3)/(x2-x3)))*(x1-x2);
 	}
+
+	public boolean isValid(){
+		//Enforce chip placement rule 1. Cannot place in corners.
+		if (hasChip(0,0) || hasChip(Constants.BOARDWIDTH-1,0) || hasChip(0,Constants.BOARDHEIGHT-1) || hasChip(Constants.BOARDWIDTH-1,Constants.BOARDHEIGHT-1)){
+			return false;
+		}
+		//Enforce chip placement rule 2. Cannot place in wrong goal.
+		for (int x = 0; x < Constants.BOARDWIDTH; x++){
+			if (hasChip(x,Constants.BLACK_GOAL_ROW) && getChip(x,Constants.BLACK_GOAL_ROW).color==Constants.WHITE){
+				return false;
+			}
+			if (hasChip(x,Constants.WHITE_GOAL_ROW) && getChip(x,Constants.WHITE_GOAL_ROW).color==Constants.BLACK){
+				return false;
+			}
+		}
+		//Enforce chip placement rule 4. Cannot place three in contact.
+		for (int x = 0; x < Constants.BOARDWIDTH; x++){
+			for (int y = 0; y < Constants.BOARDHEIGHT; y++){
+				if (getSameColorNeighbors(x,y)>=2){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	/**
 	 *
 	 *	Returns the number of same-color neighbors this chip has.
 	 *	@returns the number of neighbors of this chip's color.
 	 *
 	**/
-	public int getSameColorNeighbors() {
-		return 0;
+	private int getSameColorNeighbors(int x, int y) {
+		if (!hasChip(x,y)){
+			return 0;
+		}
+		int total = 0;
+		int currColor = grid[x][y].getColor();
+		//Check the top left corner
+		if (x!=0 && y!=0 && hasChip(x-1,y-1) && grid[x-1][y-1].getColor()==currColor){
+			total+=1;
+		}
+		if (x!=0 && hasChip(x-1,y) && grid[x-1][y].getColor()==currColor){
+			total+=1;
+		}
+		if (y!=0 && hasChip(x,y-1) && grid[x][y-1].getColor()==currColor){
+			total+=1;
+		}
+		//Check the bottom right corner
+		if (x!=Constants.BOARDWIDTH-1 && y!=Constants.BOARDHEIGHT-1 && hasChip(x+1,y+1) && grid[x+1][y+1].getColor()==currColor){
+			total+=1;
+		}
+		if (x!=Constants.BOARDWIDTH-1 && hasChip(x+1,y) && grid[x+1][y].getColor()==currColor){
+			total+=1;
+		}
+		if (y!=Constants.BOARDHEIGHT-1 && hasChip(x,y+1) && grid[x][y+1].getColor()==currColor){
+			total+=1;
+		}
+		//Check the bottom left corner
+		if (x!=0 && y!=Constants.BOARDHEIGHT-1 && hasChip(x-1,y+1) && grid[x-1][y+1].getColor()==currColor){
+			total+=1;
+		}
+		//Check the top right corner
+		if (x!=Constants.BOARDWIDTH-1 && y!=0 && hasChip(x+1,y-1) && grid[x+1][y-1].getColor()==currColor){
+			total+=1;
+		}
+		return total;
 	}
+
 	/**
 	 *
 	 * Returns whether the game is over.
 	 * @return the color of the winning player, or Constants.NULL_PLAYER if the game is not over.
 	 *
 	**/
-	public int isGameOver();
+	public int isGameOver(){
+		return 0;//TODO
+	}
+
+	public String toString(){
+		String out="";
+		for (int y = 0; y < Constants.BOARDHEIGHT; y++){
+			for (int x = 0; x < Constants.BOARDWIDTH; x++){
+				if (!hasChip(x,y)){
+					out+=".";
+				}else if (getChip(x,y).color==Constants.BLACK){
+					out+="X";
+				}else if (getChip(x,y).color==Constants.WHITE){
+					out+="O";
+				}else{
+					Constants.print("This should never happen (at Board.toString)");
+				}
+			}
+			out+="\n";
+		}
+		return out;
+	}
+
+	public static void main(String[] args){
+		Board board;
+		Constants.print("");
+		Constants.print("Testing Board.getSameColorNeighbors...");
+		Constants.print("======================================");
+		board = new Board();
+		board.grid[5][5]=new Chip(Constants.BLACK);
+		board.grid[5][6]=new Chip(Constants.BLACK);
+		board.grid[5][7]=new Chip(Constants.BLACK);
+		board.grid[6][6]=new Chip(Constants.WHITE);
+		Constants.printTest(1,board.getSameColorNeighbors(5,5));
+		board.grid[4][4]=new Chip(Constants.BLACK);
+		board.grid[4][5]=new Chip(Constants.BLACK);
+		board.grid[4][6]=new Chip(Constants.BLACK);
+		board.grid[5][4]=new Chip(Constants.BLACK);
+		board.grid[6][4]=new Chip(Constants.BLACK);
+		board.grid[6][5]=new Chip(Constants.BLACK);
+		Constants.printTest(7,board.getSameColorNeighbors(5,5));
+
+		board.grid[0][0]=new Chip(Constants.WHITE);
+		Constants.printTest(0,board.getSameColorNeighbors(0,0));
+		board.grid[0][1]=new Chip(Constants.WHITE);
+		Constants.printTest(1,board.getSameColorNeighbors(0,0));
+		board.grid[1][1]=new Chip(Constants.WHITE);
+		board.grid[1][0]=new Chip(Constants.WHITE);
+		Constants.printTest(3,board.getSameColorNeighbors(0,0));
+
+		Constants.print("");
+		Constants.print("Testing Board.addChip...");
+		Constants.print("========================");
+		board = new Board();
+		Constants.print(board);
+
+		Constants.print("Testing enforcement of Placement Rule 1...");
+		Constants.print("--------------------------------");
+		Constants.print("\t The following tests");
+		Constants.print("\t should all throw");
+		Constants.print("\t exceptions.");
+		Constants.print("--------------------------------");
+		testAdd(board,Constants.BLACK,0,0);
+		testAdd(board,Constants.WHITE,0,0);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,0);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,0);
+		testAdd(board,Constants.BLACK,0,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,0,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,Constants.BOARDHEIGHT-1);
+
+		Constants.print("");
+		Constants.print("Board State after tests:");
+		Constants.print(board);
+
+		Constants.print("");
+		Constants.print("Testing enforcement of Placement Rule 2...");
+		Constants.print("------------------------------------------");
+		Constants.print("\t The following tests");
+		Constants.print("\t should all throw");
+		Constants.print("\t exceptions.");
+		Constants.print("------------------------------------------");
+		testAdd(board,Constants.BLACK,1,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,2,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,3,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,4,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,5,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,6,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,1,0);
+		testAdd(board,Constants.WHITE,2,0);
+		testAdd(board,Constants.WHITE,3,0);
+		testAdd(board,Constants.WHITE,4,0);
+		testAdd(board,Constants.WHITE,5,0);
+		testAdd(board,Constants.WHITE,6,0);
+		Constants.print(board);
+		Constants.print("");
+		Constants.print("");
+		Constants.print("------------------------------------------");
+		Constants.print("\t The following tests");
+		Constants.print("\t should not throw");
+		Constants.print("\t exceptions.");
+		Constants.print("------------------------------------------");
+		testAdd(board,Constants.WHITE,1,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,2,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,4,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,5,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,1,0);
+		testAdd(board,Constants.BLACK,2,0);
+		testAdd(board,Constants.BLACK,4,0);
+		testAdd(board,Constants.BLACK,5,0);
+		Constants.print(board);
+		Constants.print("");
+		Constants.print("");
+		Constants.print("Testing enforcement of Placement Rule 3...");
+		Constants.print("------------------------------------------");
+		Constants.print("\t The following tests");
+		Constants.print("\t should all throw");
+		Constants.print("\t exceptions.");
+		Constants.print("------------------------------------------");
+		testAdd(board,Constants.BLACK,1,0);
+		testAdd(board,Constants.BLACK,2,0);
+		testAdd(board,Constants.BLACK,4,0);
+		testAdd(board,Constants.BLACK,5,0);
+		Constants.print(board);
+		Constants.print("");
+		Constants.print("");
+		Constants.print("Testing enforcement of Placement Rule 4...");
+		Constants.print("------------------------------------------");
+		Constants.print("\t The following tests");
+		Constants.print("\t should all throw");
+		Constants.print("\t exceptions.");
+		Constants.print("------------------------------------------");
+		testAdd(board,Constants.WHITE,3,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,6,Constants.BOARDHEIGHT-1);			//Pointless Comment
+		testAdd(board,Constants.BLACK,3,0);
+		testAdd(board,Constants.BLACK,6,0);
+		Constants.print(board);
+		Constants.print("");
+		Constants.print("");
+		Constants.print("------------------------------------------");
+		Constants.print("\t The following tests");
+		Constants.print("\t should not throw");
+		Constants.print("\t exceptions.");
+		Constants.print("------------------------------------------");
+		testAdd(board,Constants.BLACK,2,Constants.BOARDHEIGHT-2);
+		testAdd(board,Constants.BLACK,4,Constants.BOARDHEIGHT-2);
+		testAdd(board,Constants.WHITE,2,1);
+		testAdd(board,Constants.WHITE,4,1);
+		Constants.print(board);
+		Constants.print("");
+		Constants.print("");
+		Constants.print("Testing random placements...");
+		for (int x = 0; x < Constants.BOARDWIDTH; x++){
+			for (int y = 0; y < Constants.BOARDHEIGHT; y++){
+				testAdd(board,Constants.WHITE,x,y);
+			}
+		}
+		for (int x = 0; x < Constants.BOARDWIDTH; x++){
+			for (int y = 0; y < Constants.BOARDHEIGHT; y++){
+				testAdd(board,Constants.BLACK,x,y);
+			}
+		}
+		Constants.print(board);
+	}
+	private static void testAdd(Board b,int color, int x,int y){
+		String colorStr="";
+		if (color == Constants.BLACK){
+			colorStr="black";
+		}else if (color == Constants.WHITE){
+			colorStr="white";
+		}
+		Constants.print("Adding " + colorStr +" chip to ("+x+","+y+")");
+		try{
+			b.addChip(color,x,y);
+		}catch(InvalidMoveException e){
+			Constants.print(e);
+		}
+
+	}
+}

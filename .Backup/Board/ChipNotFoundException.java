@@ -1,6 +1,7 @@
-public class ChipNotFoundException extends Exception{
+public Class ChipNotFoundException extends Exception{
 	/* ChipNotFoundException.java */
 
+package board;
 
 /**
  *  Implements an Exception that says a chip cannot be found.
@@ -9,7 +10,7 @@ public class ChipNotFoundException extends Exception{
     super();
   }
 
-  protected ChipNotFoundException(String msg) {
-    super(msg);
+  protected ChipNotFoundException(String s) {
+    super(s);
   }
 }
