@@ -1,7 +1,7 @@
 /**
  *	Board represents a single game state. It knows the 
  *	position of each chip, and enforces the rules of the 
- *	game, becoming "invalid" when a violation is reached.
+ *	game, throwing an exception when a violation is reached.
  *	
  *	Invariants:
  *  	1. Will throw an exception if a move is illegal.
@@ -13,6 +13,9 @@
  *	
 **/
 
+package Board;
+
+import Constants.Constants;
 
 public class Board{	
 
@@ -32,9 +35,8 @@ public class Board{
 	/**
 	 *
 	 *	Moves chip c to point x,y
-	 *	@param c The chip to be moved.
-	 *	@param x The x coordinate of the chip's destination.
-	 *	@param y The y coordinate of the chip's destination.
+	 *	@param x1,x2 the coordinates of the chip to be moved.
+	 *	@param x1,x2 the coordinates of the chip's destination.
 	 *
 	**/
 	public void moveChip(int x1, int y1, int x2, int y2) throws InvalidMoveException{
@@ -63,6 +65,9 @@ public class Board{
 	/**
 	 *
 	 *	Creates chip at x,y.
+	 *	@param color the color of the chip to be
+	 *		   created
+	 *	@param x the destination x coordinate
 	 *	@param x the destination x coordinate
 	 *	@param y the destination y coorinate
 	 *
@@ -90,8 +95,7 @@ public class Board{
 	 *	Gets the chip at x,y.
 	 *	@param x the target x coordinate
 	 *	@param y the target y coordinate
-	 *	@throws ChipNotFoundException if there is no chip at x,y
-	 *	@return the Chip at x,y
+	 *	@return the Chip at x,y, or null if there is no chip.
 	 *
 	**/
 	public Chip getChip(int x, int y){
@@ -113,8 +117,8 @@ public class Board{
 	/**
 	 *
 	 *	Returns whether this Chip a is line of sight with Chip b
-	 *	@param a is the chip of reference.
-	 *	@param b is the chip for comparison
+	 *	@param x1,y1 are the coordinates of the chip of reference.
+	 *	@param x2,y2 are the coordinates of the chip for comparison
 	 *	@return whether the chip is line of sight with b
 	 *
 	**/
@@ -153,13 +157,22 @@ public class Board{
 		}
 		//Enforce chip placement rule 2. Cannot place in wrong goal.
 		for (int x = 0; x < Constants.BOARDWIDTH; x++){
-			if (hasChip(x,Constants.BLACK_GOAL_ROW) && getChip(x,Constants.BLACK_GOAL_ROW).color==Constants.WHITE){
+			if (hasChip(x,0) && getChip(x,0).color==Constants.BLACK){
 				return false;
 			}
-			if (hasChip(x,Constants.WHITE_GOAL_ROW) && getChip(x,Constants.WHITE_GOAL_ROW).color==Constants.BLACK){
+			if (hasChip(x,Constants.BOARDHEIGHT-1) && getChip(x,Constants.BOARDHEIGHT-1).color==Constants.BLACK){
 				return false;
 			}
 		}
+		for (int y = 0; y < Constants.BOARDHEIGHT; y++){
+			if (hasChip(0,y) && getChip(0,y).color==Constants.WHITE){
+				return false;
+			}
+			if (hasChip(Constants.BOARDWIDTH-1,y) && getChip(Constants.BOARDWIDTH-1,y).color==Constants.WHITE){
+				return false;
+			}
+		}
+
 		//Enforce chip placement rule 4. Cannot place three in contact.
 		for (int x = 0; x < Constants.BOARDWIDTH; x++){
 			for (int y = 0; y < Constants.BOARDHEIGHT; y++){
@@ -187,9 +200,11 @@ public class Board{
 		if (x!=0 && y!=0 && hasChip(x-1,y-1) && grid[x-1][y-1].getColor()==currColor){
 			total+=1;
 		}
+		//Check left
 		if (x!=0 && hasChip(x-1,y) && grid[x-1][y].getColor()==currColor){
 			total+=1;
 		}
+		//Check up
 		if (y!=0 && hasChip(x,y-1) && grid[x][y-1].getColor()==currColor){
 			total+=1;
 		}
@@ -197,9 +212,11 @@ public class Board{
 		if (x!=Constants.BOARDWIDTH-1 && y!=Constants.BOARDHEIGHT-1 && hasChip(x+1,y+1) && grid[x+1][y+1].getColor()==currColor){
 			total+=1;
 		}
+		//Check right
 		if (x!=Constants.BOARDWIDTH-1 && hasChip(x+1,y) && grid[x+1][y].getColor()==currColor){
 			total+=1;
 		}
+		//Check down
 		if (y!=Constants.BOARDHEIGHT-1 && hasChip(x,y+1) && grid[x][y+1].getColor()==currColor){
 			total+=1;
 		}
@@ -308,12 +325,25 @@ public class Board{
 		testAdd(board,Constants.BLACK,4,Constants.BOARDHEIGHT-1);
 		testAdd(board,Constants.BLACK,5,Constants.BOARDHEIGHT-1);
 		testAdd(board,Constants.BLACK,6,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.WHITE,1,0);
-		testAdd(board,Constants.WHITE,2,0);
-		testAdd(board,Constants.WHITE,3,0);
-		testAdd(board,Constants.WHITE,4,0);
-		testAdd(board,Constants.WHITE,5,0);
-		testAdd(board,Constants.WHITE,6,0);
+		testAdd(board,Constants.BLACK,1,0);
+		testAdd(board,Constants.BLACK,2,0);
+		testAdd(board,Constants.BLACK,3,0);
+		testAdd(board,Constants.BLACK,4,0);
+		testAdd(board,Constants.BLACK,5,0);
+		testAdd(board,Constants.BLACK,6,0);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,1);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,2);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,3);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,4);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,5);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,6);
+		testAdd(board,Constants.WHITE,0,1);
+		testAdd(board,Constants.WHITE,0,2);
+		testAdd(board,Constants.WHITE,0,3);
+		testAdd(board,Constants.WHITE,0,4);
+		testAdd(board,Constants.WHITE,0,5);
+		testAdd(board,Constants.WHITE,0,6);
+
 		Constants.print(board);
 		Constants.print("");
 		Constants.print("");
@@ -322,14 +352,27 @@ public class Board{
 		Constants.print("\t should not throw");
 		Constants.print("\t exceptions.");
 		Constants.print("------------------------------------------");
+
+
+
 		testAdd(board,Constants.WHITE,1,Constants.BOARDHEIGHT-1);
 		testAdd(board,Constants.WHITE,2,Constants.BOARDHEIGHT-1);
 		testAdd(board,Constants.WHITE,4,Constants.BOARDHEIGHT-1);
 		testAdd(board,Constants.WHITE,5,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.BLACK,1,0);
-		testAdd(board,Constants.BLACK,2,0);
-		testAdd(board,Constants.BLACK,4,0);
-		testAdd(board,Constants.BLACK,5,0);
+		testAdd(board,Constants.WHITE,1,0);
+		testAdd(board,Constants.WHITE,2,0);
+		testAdd(board,Constants.WHITE,4,0);
+		testAdd(board,Constants.WHITE,5,0);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,1);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,2);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,4);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,5);
+		testAdd(board,Constants.BLACK,0,1);
+		testAdd(board,Constants.BLACK,0,2);
+		testAdd(board,Constants.BLACK,0,4);
+		testAdd(board,Constants.BLACK,0,5);
+
+
 		Constants.print(board);
 		Constants.print("");
 		Constants.print("");
@@ -353,9 +396,13 @@ public class Board{
 		Constants.print("\t exceptions.");
 		Constants.print("------------------------------------------");
 		testAdd(board,Constants.WHITE,3,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.WHITE,6,Constants.BOARDHEIGHT-1);			//Pointless Comment
-		testAdd(board,Constants.BLACK,3,0);
-		testAdd(board,Constants.BLACK,6,0);
+		testAdd(board,Constants.WHITE,6,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,3,0);
+		testAdd(board,Constants.WHITE,6,0);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,3);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,6);
+		testAdd(board,Constants.BLACK,0,3);
+		testAdd(board,Constants.BLACK,0,6);
 		Constants.print(board);
 		Constants.print("");
 		Constants.print("");
@@ -366,8 +413,12 @@ public class Board{
 		Constants.print("------------------------------------------");
 		testAdd(board,Constants.BLACK,2,Constants.BOARDHEIGHT-2);
 		testAdd(board,Constants.BLACK,4,Constants.BOARDHEIGHT-2);
-		testAdd(board,Constants.WHITE,2,1);
-		testAdd(board,Constants.WHITE,4,1);
+		testAdd(board,Constants.BLACK,2,1);
+		testAdd(board,Constants.BLACK,4,1);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-2,2);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-2,4);
+		testAdd(board,Constants.WHITE,1,2);
+		testAdd(board,Constants.WHITE,1,4);
 		Constants.print(board);
 		Constants.print("");
 		Constants.print("");

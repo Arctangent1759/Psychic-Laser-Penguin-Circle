@@ -3,6 +3,9 @@
  *	The chip ADT represents a single chip on the board.
  *
 **/
+
+package Board;
+
 public class Chip{
 	protected int color;
 
