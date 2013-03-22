@@ -1,4 +1,5 @@
 /**
+ *
  *	Board represents a single game state. It knows the 
  *	position of each chip, and enforces the rules of the 
  *	game, throwing an exception when a violation is reached.
@@ -10,6 +11,7 @@
  *  	4. Cannot place more than 10 chips of the same color.
  *  	5. No chips in wrong goals.
  *  	6. No chips in corners.
+ *  	7. The board will NOT CHANGE in the event of an exception
  *	
 **/
 
@@ -157,18 +159,18 @@ public class Board{
 		}
 		//Enforce chip placement rule 2. Cannot place in wrong goal.
 		for (int x = 0; x < Constants.BOARDWIDTH; x++){
-			if (hasChip(x,0) && getChip(x,0).color==Constants.BLACK){
+			if (hasChip(x,0) && getChip(x,0).color==Constants.WHITE){
 				return false;
 			}
-			if (hasChip(x,Constants.BOARDHEIGHT-1) && getChip(x,Constants.BOARDHEIGHT-1).color==Constants.BLACK){
+			if (hasChip(x,Constants.BOARDHEIGHT-1) && getChip(x,Constants.BOARDHEIGHT-1).color==Constants.WHITE){
 				return false;
 			}
 		}
 		for (int y = 0; y < Constants.BOARDHEIGHT; y++){
-			if (hasChip(0,y) && getChip(0,y).color==Constants.WHITE){
+			if (hasChip(0,y) && getChip(0,y).color==Constants.BLACK){
 				return false;
 			}
-			if (hasChip(Constants.BOARDWIDTH-1,y) && getChip(Constants.BOARDWIDTH-1,y).color==Constants.WHITE){
+			if (hasChip(Constants.BOARDWIDTH-1,y) && getChip(Constants.BOARDWIDTH-1,y).color==Constants.BLACK){
 				return false;
 			}
 		}
@@ -286,13 +288,11 @@ public class Board{
 		board.grid[1][1]=new Chip(Constants.WHITE);
 		board.grid[1][0]=new Chip(Constants.WHITE);
 		Constants.printTest(3,board.getSameColorNeighbors(0,0));
-
 		Constants.print("");
 		Constants.print("Testing Board.addChip...");
 		Constants.print("========================");
 		board = new Board();
 		Constants.print(board);
-
 		Constants.print("Testing enforcement of Placement Rule 1...");
 		Constants.print("--------------------------------");
 		Constants.print("\t The following tests");
@@ -307,11 +307,9 @@ public class Board{
 		testAdd(board,Constants.WHITE,0,Constants.BOARDHEIGHT-1);
 		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,Constants.BOARDHEIGHT-1);
 		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,Constants.BOARDHEIGHT-1);
-
 		Constants.print("");
 		Constants.print("Board State after tests:");
 		Constants.print(board);
-
 		Constants.print("");
 		Constants.print("Testing enforcement of Placement Rule 2...");
 		Constants.print("------------------------------------------");
@@ -319,31 +317,30 @@ public class Board{
 		Constants.print("\t should all throw");
 		Constants.print("\t exceptions.");
 		Constants.print("------------------------------------------");
-		testAdd(board,Constants.BLACK,1,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.BLACK,2,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.BLACK,3,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.BLACK,4,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.BLACK,5,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.BLACK,6,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.BLACK,1,0);
-		testAdd(board,Constants.BLACK,2,0);
-		testAdd(board,Constants.BLACK,3,0);
-		testAdd(board,Constants.BLACK,4,0);
-		testAdd(board,Constants.BLACK,5,0);
-		testAdd(board,Constants.BLACK,6,0);
-		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,1);
-		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,2);
-		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,3);
-		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,4);
-		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,5);
-		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,6);
-		testAdd(board,Constants.WHITE,0,1);
-		testAdd(board,Constants.WHITE,0,2);
-		testAdd(board,Constants.WHITE,0,3);
-		testAdd(board,Constants.WHITE,0,4);
-		testAdd(board,Constants.WHITE,0,5);
-		testAdd(board,Constants.WHITE,0,6);
-
+		testAdd(board,Constants.WHITE,1,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,2,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,3,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,4,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,5,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,6,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.WHITE,1,0);
+		testAdd(board,Constants.WHITE,2,0);
+		testAdd(board,Constants.WHITE,3,0);
+		testAdd(board,Constants.WHITE,4,0);
+		testAdd(board,Constants.WHITE,5,0);
+		testAdd(board,Constants.WHITE,6,0);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,1);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,2);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,3);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,4);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,5);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,6);
+		testAdd(board,Constants.BLACK,0,1);
+		testAdd(board,Constants.BLACK,0,2);
+		testAdd(board,Constants.BLACK,0,3);
+		testAdd(board,Constants.BLACK,0,4);
+		testAdd(board,Constants.BLACK,0,5);
+		testAdd(board,Constants.BLACK,0,6);
 		Constants.print(board);
 		Constants.print("");
 		Constants.print("");
@@ -352,27 +349,22 @@ public class Board{
 		Constants.print("\t should not throw");
 		Constants.print("\t exceptions.");
 		Constants.print("------------------------------------------");
-
-
-
-		testAdd(board,Constants.WHITE,1,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.WHITE,2,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.WHITE,4,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.WHITE,5,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.WHITE,1,0);
-		testAdd(board,Constants.WHITE,2,0);
-		testAdd(board,Constants.WHITE,4,0);
-		testAdd(board,Constants.WHITE,5,0);
-		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,1);
-		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,2);
-		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,4);
-		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,5);
-		testAdd(board,Constants.BLACK,0,1);
-		testAdd(board,Constants.BLACK,0,2);
-		testAdd(board,Constants.BLACK,0,4);
-		testAdd(board,Constants.BLACK,0,5);
-
-
+		testAdd(board,Constants.BLACK,1,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,2,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,4,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,5,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,1,0);
+		testAdd(board,Constants.BLACK,2,0);
+		testAdd(board,Constants.BLACK,4,0);
+		testAdd(board,Constants.BLACK,5,0);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,1);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,2);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,4);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,5);
+		testAdd(board,Constants.WHITE,0,1);
+		testAdd(board,Constants.WHITE,0,2);
+		testAdd(board,Constants.WHITE,0,4);
+		testAdd(board,Constants.WHITE,0,5);
 		Constants.print(board);
 		Constants.print("");
 		Constants.print("");
@@ -395,14 +387,14 @@ public class Board{
 		Constants.print("\t should all throw");
 		Constants.print("\t exceptions.");
 		Constants.print("------------------------------------------");
-		testAdd(board,Constants.WHITE,3,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.WHITE,6,Constants.BOARDHEIGHT-1);
-		testAdd(board,Constants.WHITE,3,0);
-		testAdd(board,Constants.WHITE,6,0);
-		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,3);
-		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-1,6);
-		testAdd(board,Constants.BLACK,0,3);
-		testAdd(board,Constants.BLACK,0,6);
+		testAdd(board,Constants.BLACK,3,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,6,Constants.BOARDHEIGHT-1);
+		testAdd(board,Constants.BLACK,3,0);
+		testAdd(board,Constants.BLACK,6,0);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,3);
+		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-1,6);
+		testAdd(board,Constants.WHITE,0,3);
+		testAdd(board,Constants.WHITE,0,6);
 		Constants.print(board);
 		Constants.print("");
 		Constants.print("");
@@ -411,14 +403,14 @@ public class Board{
 		Constants.print("\t should not throw");
 		Constants.print("\t exceptions.");
 		Constants.print("------------------------------------------");
-		testAdd(board,Constants.BLACK,2,Constants.BOARDHEIGHT-2);
-		testAdd(board,Constants.BLACK,4,Constants.BOARDHEIGHT-2);
-		testAdd(board,Constants.BLACK,2,1);
-		testAdd(board,Constants.BLACK,4,1);
-		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-2,2);
-		testAdd(board,Constants.WHITE,Constants.BOARDWIDTH-2,4);
-		testAdd(board,Constants.WHITE,1,2);
-		testAdd(board,Constants.WHITE,1,4);
+		testAdd(board,Constants.WHITE,2,Constants.BOARDHEIGHT-2);
+		testAdd(board,Constants.WHITE,4,Constants.BOARDHEIGHT-2);
+		testAdd(board,Constants.WHITE,2,1);
+		testAdd(board,Constants.WHITE,4,1);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-2,2);
+		testAdd(board,Constants.BLACK,Constants.BOARDWIDTH-2,4);
+		testAdd(board,Constants.BLACK,1,2);
+		testAdd(board,Constants.BLACK,1,4);
 		Constants.print(board);
 		Constants.print("");
 		Constants.print("");
