@@ -248,15 +248,14 @@ public class Board{
 		}
 		return total;
 	}
-
 	/**
 	 *
 	 * Returns whether the game is over.
 	 * @return the color of the winning player, or Constants.NULL_PLAYER if the game is not over.
 	 *
 	**/
-	public int isGameOver(){
-		return 0;//TODO
+	public int isGameOver() {
+		return 0; //TODO
 	}
 
 	public String toString(){
