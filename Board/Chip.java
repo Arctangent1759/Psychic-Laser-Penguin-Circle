@@ -1,6 +1,6 @@
 /**
  *
- *	The chip ADT represents a single chip on the board.
+ *	The chip data container represents a single chip on the board.
  *
 **/
 
@@ -8,6 +8,7 @@ package Board;
 
 public class Chip{
 	protected int color;
+	protected boolean visited;
 
 	/**
 	 *
@@ -17,7 +18,9 @@ public class Chip{
 	**/
 	public Chip(int color) {
 		this.color = color;
+		this.visited=false;
 	}
+
 	/**
 	 *
 	 *	Get the color of the chip

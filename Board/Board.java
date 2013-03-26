@@ -18,6 +18,8 @@
 package Board;
 
 import Constants.Constants;
+import DList.*;
+
 
 public class Board{	
 
@@ -42,7 +44,6 @@ public class Board{
 	 *
 	**/
 	public void moveChip(int x1, int y1, int x2, int y2) throws InvalidMoveException{
-
 		//Make sure there's a chip at (x1,y1)
 		if (!hasChip(x1,y1)){
 			throw new InvalidMoveException("No chip to move from (" + x1 + "," + y1 + ") to (" + x2 + "," + y2 + ").");
@@ -262,6 +263,57 @@ public class Board{
 		return out;
 	}
 
+	/**
+	 *
+	 * Returns a list of networks
+	 * @return a DList of networks
+	 *
+	**/
+
+	public DList<Net> getLongestNetworks(){
+		DList<Net> out = new DList<Net>();
+		for (int x = 0; x < Constants.BOARDWIDTH;x++){
+			if (hasChip(x,0)){
+				out.append(expandLongestNetFromChip(getChip(x,0),x,0,"None"));
+			}
+			if (hasChip(x,Constants.BOARDWIDTH-1)){
+				out.append(expandLongestNetFromChip(getChip(x,Constants.BOARDWIDTH-1),x,Constants.BOARDWIDTH-1,"None"));
+			}
+		}
+		for (int y = 0; y < Constants.BOARDHEIGHT;y++){
+			if (hasChip(y,0)){
+				out.append(expandLongestNetFromChip(getChip(0,y),0,y,"None"));
+			}
+			if (hasChip(Constants.BOARDHEIGHT-1,y)){
+				out.append(expandLongestNetFromChip(getChip(Constants.BOARDHEIGHT-1,y),Constants.BOARDHEIGHT-1,y,"None"));
+			}
+		}
+		return out;
+	}
+
+	private DList<Net> expandLongestNetFromChip(Chip c, int x, int y, String last_direction){
+		c.visited=true;
+
+		Constants.print("Expanding from "+colorStr(c.getColor())+" chip at ("+x+","+y+").");
+
+		DList<Net> out = new DList<Net>();
+
+		for (int distance = 0; distance < Math.max(Constants.BOARDWIDTH,Constants.BOARDHEIGHT); distance++){
+			if (x+distance < Constants.BOARDWIDTH-1){}
+			if (x-distance > 0){}
+			if (y+distance < Constants.BOARDHEIGHT-1){}
+			if (y-distance > 0){}
+			if ((x+distance < Constants.BOARDWIDTH-1)&&(y+distance < Constants.BOARDHEIGHT-1)){}
+			if ((x+distance > 0)&&(y+distance < Constants.BOARDHEIGHT-1)){}
+			if ((x+distance < Constants.BOARDWIDTH-1)&&(y+distance > 0)){}
+			if ((x+distance > 0)&&(y+distance > 0)){}
+		}
+
+
+		c.visited=false;
+		return out;
+	}
+
 	public static void main(String[] args){
 		Board board;
 		Constants.print("");
@@ -280,7 +332,6 @@ public class Board{
 		board.grid[6][4]=new Chip(Constants.BLACK);
 		board.grid[6][5]=new Chip(Constants.BLACK);
 		Constants.printTest(7,board.getSameColorNeighbors(5,5));
-
 		board.grid[0][0]=new Chip(Constants.WHITE);
 		Constants.printTest(0,board.getSameColorNeighbors(0,0));
 		board.grid[0][1]=new Chip(Constants.WHITE);
@@ -426,6 +477,7 @@ public class Board{
 			}
 		}
 		Constants.print(board);
+		board.getLongestNetworks();
 	}
 	private static void testAdd(Board b,int color, int x,int y){
 		String colorStr="";
@@ -441,5 +493,15 @@ public class Board{
 			Constants.print(e);
 		}
 
+	}
+
+	private static String colorStr(int c){
+		if (c==Constants.BLACK){
+			return "black";
+		}else if (c==Constants.WHITE){
+			return "white";
+		}else{
+			return "null";
+		}
 	}
 }

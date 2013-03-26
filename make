@@ -4,3 +4,4 @@ javac HashTable/*.java;
 javac HashTable/BucketList/*.java;
 javac HashTable/BucketList/DList/*.java;
 javac player/*.java;
+javac DList/*.java;
