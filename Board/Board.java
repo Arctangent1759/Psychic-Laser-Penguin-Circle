@@ -318,6 +318,7 @@ public class Board{
 		{
 			if (c.getColor() == Constants.WHITE && (x==0 || x==Constants.BOARDWIDTH-1)){
 				if (x==origin_x){
+					out.push(new Net(c.getColor(),depth,false));
 					return out;
 				}else{
 					out.push(new Net(c.getColor(),depth+1,depth+1>=6));
@@ -326,6 +327,7 @@ public class Board{
 			}
 			if (c.getColor() == Constants.BLACK && (y==0 || y==Constants.BOARDHEIGHT-1)){
 				if (y==origin_y){
+					out.push(new Net(c.getColor(),depth,false));
 					return out;
 				}else{
 					out.push(new Net(c.getColor(),depth+1,depth+1>=6));
