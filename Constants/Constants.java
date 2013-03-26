@@ -23,6 +23,10 @@ public final class Constants{
 
 	//Game Constants
 	public static final int MAX_CHIPS=10; //The maximum number of chips in the game
+	
+	// Machine Player Constants
+	public static final int START_ALPHA = -100;
+	public static final int START_BETA = 100;
 
 
 	//Debugging and misc.

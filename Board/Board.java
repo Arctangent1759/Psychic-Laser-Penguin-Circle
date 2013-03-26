@@ -188,6 +188,22 @@ public class Board{
 	}
 
 	/**
+	*
+	*
+	*	Returns the hashCode of the object.
+	*	@returns hashCode.
+	**/
+	public int hashCode(){
+		int hash = 0;
+		int power = 1;
+		String string = toString();
+		for(int width = 0; width<Constants.BOARDWIDTH;width++){
+			for(int length = 0;length<Constants.BOARDLENGTH;length++){
+				hash = hash + power*grid[x][y];
+				power = power * 3;
+		}
+	}
+	/**
 	 *
 	 *	Returns the number of same-color neighbors this chip has.
 	 *	@returns the number of neighbors of this chip's color.
@@ -233,15 +249,14 @@ public class Board{
 		}
 		return total;
 	}
-
 	/**
 	 *
 	 * Returns whether the game is over.
 	 * @return the color of the winning player, or Constants.NULL_PLAYER if the game is not over.
 	 *
 	**/
-	public int isGameOver(){
-		return 0;//TODO
+	public int isGameOver() {
+		return 0; //TODO
 	}
 
 	public String toString(){
