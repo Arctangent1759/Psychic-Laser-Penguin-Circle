@@ -1,18 +1,76 @@
 package HashTable;
-import HashTable.BucketList.BucketList;
+import DList.*;
+
+/***
+*An Enhanced version of hashTable utilizing DList.
+*
+*
+*
+*
+*
+*/
 public class HashTable{
-	protected BucketList[] chains;
-	public HashTable(int numBuckets){
-		chains = new BucketList[numBuckets];
-		for (int i = 0; i < numBuckets; i++){
-			chains[i] = new BucketList(i);
+	protected DList<Entry>[] chains;
+	/**
+	*  Constructor of the bucket.
+	*   @param numBuckets represents expected size of hashTable. 
+	**/ 
+	public HashTable(int sizeExpected){
+		int prime = sizeExpected;
+		if(prime%2 == 0){
+			prime++;
+		}
+		boolean isPrime = false;
+		while(!isPrime){
+			for(int i = 0; i<prime;i++){
+				if(prime%i == 0){
+					isPrime = false;
+					prime+=2;
+					break;
+				}
+				else{
+					isPrime = true;
+				}
+			}
+		}
+		chains = new DList<Entry>[prime];
+		for (int i = 0; i < prime; i++){
+			chains[i] = new DList<Entry>();
 		}
 	}
-	public void add(Hashable h, Object value){
-		chains[h.getHash()%chains.length].addItem(h.getKey(),value);
+	/**
+	 *  Compresses the hash so it fits inside the bucket.
+	 *	@param hash is the hash being compressed.
+	 *	@return the compressed hash.
+	**/
+	public int compress(int hash){
+		int compressed = (36*hash+1507)%74531;
+		if(compressed<0){
+			compressed += 74531;
+		}
+		compressed = compressed%chains.length;
+		return compressed;
 	}
-	public Object get(Hashable h){
-		return chains[h.getHash()%chains.length].getValueByKey(h.getKey());
+
+	/**
+	 *	Adds an entry to the HashTable.
+	 *	@param 
+	 *
+	 *
+	**/
+	public void add(Object h, Object value){
+		int hash = compress(h.hashCode());
+		Entry keyValuePair = new Entry();
+		keyValuePair.key = h;
+		keyValuePair.value = value;
+		chains[hash].pushFront(keyValuePair);
+	}
+	public Object get(Object h){
+		int hash = compress(h.hashCode());
+		Entry keyValuePair = new Entry();
+		keyValuePair.key = h;
+		keyValuePair.value = value;
+		return chains[hash].getItem(h);
 	}
 
 	public static void main(String[] args){
@@ -35,15 +93,11 @@ public class HashTable{
 		System.out.println(t.get(h3));
 		System.out.println(t.get(h2));
 		System.out.println(t.get(h1));
-		BucketList[] b = t.chains;
-		for (int i =0; i < b.length; i++){
-			System.out.println(b[i]);
-		}
 	}
 }
 class Testhash implements Hashable{
 	String s;
-	public Testhash(String s){
+public Testhash(String s){
 		this.s=s;
 	}
 	public int getHash(){
