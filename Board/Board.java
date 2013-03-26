@@ -19,6 +19,7 @@ package Board;
 
 import Constants.Constants;
 import DList.*;
+import java.io.*;
 
 
 public class Board{	
@@ -240,8 +241,16 @@ public class Board{
 	 * @return the color of the winning player, or Constants.NULL_PLAYER if the game is not over.
 	 *
 	**/
-	public int isGameOver(){
-		return 0;//TODO
+	public int getWinner(){
+		DList<Net> networks = getLongestNetworks();
+		DListNode<Net> curr = networks.getFront();
+		while (curr!=null){
+			if (curr.item().complete){
+				return curr.item().player;
+			}
+			curr=curr.next();
+		}
+		return Constants.NULL_PLAYER;
 	}
 
 	public String toString(){
@@ -334,6 +343,7 @@ public class Board{
 					if (getChip(x+s,y).color==c.color && !getChip(x+s,y).visited){
 						out.append(expandLongestNetFromChip(x+s,y,1,depth+1,origin_x,origin_y));
 						isDeadEnd=false;
+						break;
 					}else{
 						break;
 					}
@@ -344,6 +354,7 @@ public class Board{
 					if (getChip(x+s,y).color==c.color && !getChip(x+s,y).visited){
 						out.append(expandLongestNetFromChip(x+s,y,1,depth+1,origin_x,origin_y));
 						isDeadEnd=false;
+						break;
 					}else{
 						break;
 					}
@@ -358,6 +369,7 @@ public class Board{
 					if (getChip(x,y+s).color==c.color && !getChip(x,y+s).visited){
 						out.append(expandLongestNetFromChip(x,y+s,2,depth+1,origin_x,origin_y));
 						isDeadEnd=false;
+						break;
 					}else{
 						break;
 					}
@@ -368,6 +380,7 @@ public class Board{
 					if (getChip(x,y+s).color==c.color && !getChip(x,y+s).visited){
 						out.append(expandLongestNetFromChip(x,y+s,2,depth+1,origin_x,origin_y));
 						isDeadEnd=false;
+						break;
 					}else{
 						break;
 					}
@@ -382,6 +395,7 @@ public class Board{
 					if (getChip(x+s,y+s).color==c.color && !getChip(x+s,y+s).visited){
 						out.append(expandLongestNetFromChip(x+s,y+s,3,depth+1,origin_x,origin_y));
 						isDeadEnd=false;
+						break;
 					}else{
 						break;
 					}
@@ -392,6 +406,7 @@ public class Board{
 					if (getChip(x+s,y+s).color==c.color && !getChip(x+s,y+s).visited){
 						out.append(expandLongestNetFromChip(x+s,y+s,3,depth+1,origin_x,origin_y));
 						isDeadEnd=false;
+						break;
 					}else{
 						break;
 					}
@@ -406,6 +421,7 @@ public class Board{
 					if (getChip(x+s,y-s).color==c.color && !getChip(x+s,y-s).visited){
 						out.append(expandLongestNetFromChip(x+s,y-s,4,depth+1,origin_x,origin_y));
 						isDeadEnd=false;
+						break;
 					}else{
 						break;
 					}
@@ -416,6 +432,7 @@ public class Board{
 					if (getChip(x+s,y-s).color==c.color && !getChip(x+s,y-s).visited){
 						out.append(expandLongestNetFromChip(x+s,y-s,4,depth+1,origin_x,origin_y));
 						isDeadEnd=false;
+						break;
 					}else{
 						break;
 					}
@@ -430,17 +447,38 @@ public class Board{
 	}
 
 	public static void main(String[] args){
+		testNetworkGetterInteractive();
+	}
+
+	//Test packages
+	
+	private static void testNetworkGetterInteractive(){
+		BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
+		int input=0;
+		Board b = new Board();
+
+		while (input<1000){
+			Constants.print(b);
+			Constants.print("Enter three integers in the format cxy, where c is color, or '1000' to quit:");
+			try{
+				input=Integer.parseInt(keyboard.readLine());
+			}
+			catch (IOException e){}
+			Constants.print("");
+			testAdd(b,(input/100)%10,(input/10)%10,input%10);
+			Constants.print(b.getLongestNetworks());
+		}
+	}
+
+	private static void testNetworkGetter(){
 		Board b=new Board();
-		testAdd(b,0,3,7);
-		testAdd(b,0,4,6);
-		testAdd(b,0,4,4);
-		testAdd(b,0,2,4);
-		testAdd(b,0,4,2);
-		testAdd(b,1,4,1);
-		testAdd(b,1,0,1);
-		testAdd(b,1,5,2);
-		testAdd(b,1,7,2);
-		testAdd(b,0,4,0);
+		testAdd(b,0,3,0);
+		testAdd(b,0,3,1);
+		testAdd(b,0,3,3);
+		testAdd(b,0,3,4);
+		testAdd(b,0,3,5);
+		testAdd(b,0,3,6);
+		testAdd(b,0,5,6);
 		Constants.print(b);
 		Constants.print(b.getLongestNetworks());
 	}
@@ -610,6 +648,9 @@ public class Board{
 		Constants.print(board);
 
 	}
+
+
+	//Util
 	private static void testAdd(Board b,int color, int x,int y){
 		String colorStr="";
 		if (color == Constants.BLACK){
