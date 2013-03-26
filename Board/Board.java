@@ -188,22 +188,6 @@ public class Board{
 	}
 
 	/**
-	*
-	*
-	*	Returns the hashCode of the object.
-	*	@returns hashCode.
-	**/
-	public int hashCode(){
-		int hash = 0;
-		int power = 1;
-		String string = toString();
-		for(int width = 0; width<Constants.BOARDWIDTH;width++){
-			for(int length = 0;length<Constants.BOARDLENGTH;length++){
-				hash = hash + power*grid[x][y];
-				power = power * 3;
-		}
-	}
-	/**
 	 *
 	 *	Returns the number of same-color neighbors this chip has.
 	 *	@returns the number of neighbors of this chip's color.
@@ -249,14 +233,15 @@ public class Board{
 		}
 		return total;
 	}
+
 	/**
 	 *
 	 * Returns whether the game is over.
 	 * @return the color of the winning player, or Constants.NULL_PLAYER if the game is not over.
 	 *
 	**/
-	public int isGameOver() {
-		return 0; //TODO
+	public int isGameOver(){
+		return 0;//TODO
 	}
 
 	public String toString(){
@@ -289,47 +274,178 @@ public class Board{
 		DList<Net> out = new DList<Net>();
 		for (int x = 0; x < Constants.BOARDWIDTH;x++){
 			if (hasChip(x,0)){
-				out.append(expandLongestNetFromChip(getChip(x,0),x,0,"None"));
+				out.append(expandLongestNetFromChip(x,0,0,0,x,0));
 			}
 			if (hasChip(x,Constants.BOARDWIDTH-1)){
-				out.append(expandLongestNetFromChip(getChip(x,Constants.BOARDWIDTH-1),x,Constants.BOARDWIDTH-1,"None"));
+				out.append(expandLongestNetFromChip(x,Constants.BOARDWIDTH-1,0,0,x,Constants.BOARDWIDTH-1));
 			}
 		}
 		for (int y = 0; y < Constants.BOARDHEIGHT;y++){
-			if (hasChip(y,0)){
-				out.append(expandLongestNetFromChip(getChip(0,y),0,y,"None"));
+			if (hasChip(0,y)){
+				out.append(expandLongestNetFromChip(0,y,0,0,0,y));
 			}
 			if (hasChip(Constants.BOARDHEIGHT-1,y)){
-				out.append(expandLongestNetFromChip(getChip(Constants.BOARDHEIGHT-1,y),Constants.BOARDHEIGHT-1,y,"None"));
+				out.append(expandLongestNetFromChip(Constants.BOARDHEIGHT-1,y,0,0,Constants.BOARDHEIGHT-1,y));
 			}
+		
 		}
 		return out;
 	}
 
-	private DList<Net> expandLongestNetFromChip(Chip c, int x, int y, String last_direction){
-		c.visited=true;
-
-		Constants.print("Expanding from "+colorStr(c.getColor())+" chip at ("+x+","+y+").");
-
+	private DList<Net> expandLongestNetFromChip(int x, int y, int last_direction, int depth, int origin_x, int origin_y){
+		//Base cases:
+		//	1. x,y is in the origin goal, return empty.
+		//	2. x,y is in the target goal, return path.
+		//Recursive cases:
+		//	1. x,y is not any of the base cases.
+		//	2. x,y is a dead end. append path.
+		
+		Chip c = getChip(x,y);
 		DList<Net> out = new DList<Net>();
+		boolean isDeadEnd=true;
 
-		for (int distance = 0; distance < Math.max(Constants.BOARDWIDTH,Constants.BOARDHEIGHT); distance++){
-			if (x+distance < Constants.BOARDWIDTH-1){}
-			if (x-distance > 0){}
-			if (y+distance < Constants.BOARDHEIGHT-1){}
-			if (y-distance > 0){}
-			if ((x+distance < Constants.BOARDWIDTH-1)&&(y+distance < Constants.BOARDHEIGHT-1)){}
-			if ((x+distance > 0)&&(y+distance < Constants.BOARDHEIGHT-1)){}
-			if ((x+distance < Constants.BOARDWIDTH-1)&&(y+distance > 0)){}
-			if ((x+distance > 0)&&(y+distance > 0)){}
+		//Check Base Cases
+		if (!(x==origin_x && y==origin_y)) //Add exception for first node
+		{
+			if (c.getColor() == Constants.WHITE && (x==0 || x==Constants.BOARDWIDTH-1)){
+				if (x==origin_x){
+					return out;
+				}else{
+					out.push(new Net(c.getColor(),depth+1,depth+1>=6));
+					return out;
+				}
+			}
+			if (c.getColor() == Constants.BLACK && (y==0 || y==Constants.BOARDHEIGHT-1)){
+				if (y==origin_y){
+					return out;
+				}else{
+					out.push(new Net(c.getColor(),depth+1,depth+1>=6));
+					return out;
+				}
+			}
+
 		}
 
+		c.visited=true;
+		//Left-right, direction code 1
+		if (last_direction!=1){ //Make sure the network turns
+			for (int s = 1; s <= Constants.BOARDWIDTH-1-x; s++){
+				if (hasChip(x+s,y)){
+					if (getChip(x+s,y).color==c.color && !getChip(x+s,y).visited){
+						out.append(expandLongestNetFromChip(x+s,y,1,depth+1,origin_x,origin_y));
+						isDeadEnd=false;
+					}else{
+						break;
+					}
+				}
+			}
+			for (int s = -1; s >= -x; s--){
+				if (hasChip(x+s,y)){
+					if (getChip(x+s,y).color==c.color && !getChip(x+s,y).visited){
+						out.append(expandLongestNetFromChip(x+s,y,1,depth+1,origin_x,origin_y));
+						isDeadEnd=false;
+					}else{
+						break;
+					}
+				}
+			}
+		}
 
+		//Up-down, direction code 2
+		if (last_direction!=2){ //Make sure the network turns
+			for (int s = 1; s <= Constants.BOARDHEIGHT-1-y; s++){
+				if (hasChip(x,y+s)){
+					if (getChip(x,y+s).color==c.color && !getChip(x,y+s).visited){
+						out.append(expandLongestNetFromChip(x,y+s,2,depth+1,origin_x,origin_y));
+						isDeadEnd=false;
+					}else{
+						break;
+					}
+				}
+			}
+			for (int s = -1; s >= -y; s--){
+				if (hasChip(x,y+s)){
+					if (getChip(x,y+s).color==c.color && !getChip(x,y+s).visited){
+						out.append(expandLongestNetFromChip(x,y+s,2,depth+1,origin_x,origin_y));
+						isDeadEnd=false;
+					}else{
+						break;
+					}
+				}
+			}
+		}
+
+		//Ascending diagonal, direction code 3
+		if (last_direction!=3){ //Make sure the network turns
+			for (int s = 1; s <= Math.min(Constants.BOARDHEIGHT-1-y,Constants.BOARDWIDTH-1-x); s++){
+				if (hasChip(x+s,y+s)){
+					if (getChip(x+s,y+s).color==c.color && !getChip(x+s,y+s).visited){
+						out.append(expandLongestNetFromChip(x+s,y+s,3,depth+1,origin_x,origin_y));
+						isDeadEnd=false;
+					}else{
+						break;
+					}
+				}
+			}
+			for (int s = -1; s >= Math.max(-x,-y); s--){
+				if (hasChip(x+s,y+s)){
+					if (getChip(x+s,y+s).color==c.color && !getChip(x+s,y+s).visited){
+						out.append(expandLongestNetFromChip(x+s,y+s,3,depth+1,origin_x,origin_y));
+						isDeadEnd=false;
+					}else{
+						break;
+					}
+				}
+			}
+		}
+
+		//Descending diagonal, direction code 4
+		if (last_direction!=4){ //Make sure the network turns
+			for (int s = 1; s <= Math.min(y,Constants.BOARDWIDTH-1-x); s++){
+				if (hasChip(x+s,y-s)){
+					if (getChip(x+s,y-s).color==c.color && !getChip(x+s,y-s).visited){
+						out.append(expandLongestNetFromChip(x+s,y-s,4,depth+1,origin_x,origin_y));
+						isDeadEnd=false;
+					}else{
+						break;
+					}
+				}
+			}
+			for (int s = -1; s >= Math.min(x,Constants.BOARDHEIGHT-1-y); s--){
+				if (hasChip(x+s,y-s)){
+					if (getChip(x+s,y-s).color==c.color && !getChip(x+s,y-s).visited){
+						out.append(expandLongestNetFromChip(x+s,y-s,4,depth+1,origin_x,origin_y));
+						isDeadEnd=false;
+					}else{
+						break;
+					}
+				}
+			}
+		}
 		c.visited=false;
+		if (isDeadEnd){
+			out.push(new Net(c.getColor(),depth+1,false));
+		}
 		return out;
 	}
 
 	public static void main(String[] args){
+		Board b=new Board();
+		testAdd(b,0,3,7);
+		testAdd(b,0,4,6);
+		testAdd(b,0,4,4);
+		testAdd(b,0,2,4);
+		testAdd(b,0,4,2);
+		testAdd(b,1,4,1);
+		testAdd(b,1,0,1);
+		testAdd(b,1,5,2);
+		testAdd(b,1,7,2);
+		testAdd(b,0,4,0);
+		Constants.print(b);
+		Constants.print(b.getLongestNetworks());
+	}
+
+	private static void testRuleImplementation(){
 		Board board;
 		Constants.print("");
 		Constants.print("Testing Board.getSameColorNeighbors...");
@@ -492,7 +608,7 @@ public class Board{
 			}
 		}
 		Constants.print(board);
-		board.getLongestNetworks();
+
 	}
 	private static void testAdd(Board b,int color, int x,int y){
 		String colorStr="";

@@ -133,12 +133,8 @@ public class DList<T>{
 		d.push(3);
 		d.push(4);
 		d.push(5);
-		d.pop();
 		DList<Integer> e = new DList<Integer>();
-		e.push(6);
-		e.push(7);
-		e.push(8);
-		e.push(9);
+		e.push(2);
 		d.appendBack(e);
 		System.out.println(d);
 		System.out.println(e);
