@@ -31,9 +31,13 @@ public class Board{
 	 *
 	**/
 	protected Chip[][] grid;
+	protected int numWhite;
+	protected int numBlack;
 	
 	public Board() {
 		grid = new Chip[Constants.BOARDWIDTH][Constants.BOARDHEIGHT];
+		numWhite = 0;
+		numBlack = 0;
 	}
 
 
@@ -84,10 +88,23 @@ public class Board{
 
 		//Create the new chip
 		grid[x][y]=new Chip(color);
+		
+		if (color == Constants.WHITE) {
+			numWhite++;
+		}
+		else {
+			numBlack++;
+		}
 
 		//Enforce chip placement rules 1, 2, and 4. These are rules dependent on board state.
 		if (!isValid()){
 			grid[x][y]=null; //Revert the board if the move invalidates the board.
+			if (color == Constants.WHITE) {
+				numWhite--;
+			}
+			else {
+				numBlack--;
+			}
 			throw new InvalidMoveException("Placement rule violated.");
 		}
 	}
@@ -186,6 +203,11 @@ public class Board{
 			}
 		}
 		return true;
+		
+		//Enforce chip limit. 
+		if (numWhite > MAX_CHIPS || numBlack > MAX_CHIPS) {
+			return false;
+		}
 	}
 
 	/**

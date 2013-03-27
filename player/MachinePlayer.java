@@ -16,6 +16,7 @@ public class MachinePlayer extends Player {
 	protected int searchDepth;
 	protected Board board;
 	protected DList<Move> moves;
+	protected HashTable boards;
 	
 	// Creates a machine player with the given color.  Color is either 0 (black)
 	// or 1 (white).  (White has the first move.)
@@ -114,7 +115,21 @@ public class MachinePlayer extends Player {
 	 * @param beta minimum upper bound for game tree
 	 * @param searchDepth how far down the game tree it will search.
 	**/
-	private Move chooseOptimalMove(int color, int beta, int alpha, int searchDepth, Board board) {
+	private Move chooseOptimalMove(int color, int alpha, int beta, int searchDepth, Board board) {
+		// ignore this for now a work in progress lulz
+		for (int x = 0; x < Constants.BOARDWIDTH; x++) {
+			for (int y =0; y < Constants.BOARDHEIGHT; y++) {
+				if (searchDepth == 1) {
+					evalBoard(color, board);
+				}
+				else if (color == Constants.WHITE) {
+					return chooseOptimalMove(Constants.BLACK, alpha, beta, searchDepth-1 , board); 
+				}
+				else {
+					return chooseOptimalMove(Constants.WHITE, alpha beta, searchDepth-1, board);
+				}
+			}
+		}
 		return new Move();
 	}
 	/**
@@ -125,8 +140,7 @@ public class MachinePlayer extends Player {
 	**/
 	private int evalBoard(int color, Board board) {
 		// The current algorithm needs serious improvement.
-		DList<Net> networks = board.getLongestNetworks();
-		int size = networks.length(); 
+		DList<Net> networks = board.getLongestNetworks(); 
 		int score = 0;
 		while (!networks.isEmpty()) {
 			Net network = networks.popFront();
@@ -146,7 +160,7 @@ public class MachinePlayer extends Player {
 				score -= netScore;
 			}
 		}
-		return ((int) (score/ size)); 
+		return score; 
 	}
 	/**
 	 *
