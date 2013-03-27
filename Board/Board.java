@@ -272,6 +272,10 @@ public class Board{
 		return out;
 	}
 
+	public String getKey(){
+		return this.toString();
+	}
+
 	/**
 	 *
 	 * Returns a list of networks
