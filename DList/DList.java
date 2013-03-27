@@ -15,6 +15,10 @@ public class DList<T>{
 		this.sentinel.next=this.sentinel;
 		this.size=0;
 	}
+	
+	public boolean isEmpty() {
+		return size == 0;
+	}
 
 	public void pushFront(T item){
 		this.sentinel.next = new DListNode<T>(item, this.sentinel, this.sentinel.next,false);

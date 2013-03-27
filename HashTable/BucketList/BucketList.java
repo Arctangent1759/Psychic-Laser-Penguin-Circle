@@ -1,4 +1,4 @@
-package HashTable.BucketList.DList;
+package HashTable.BucketList;
 /*
  * Invariants:
  * 1. length is correct.
@@ -71,7 +71,7 @@ public class BucketList{
 			curr=curr.next;
 			n--;
 		}
-		curr.prev=new DListNode(o,curr.prev,curr);
+		curr.prev=new BucketListNode(o,curr.prev,curr);
 		curr.prev.prev.next=curr.prev;
 		this.length++;
 	}
@@ -122,7 +122,7 @@ public class BucketList{
 
 	//(Mildly comical) Test code
 	public static void main(String args[]){
-		DList d = new DList();
+		BucketList d = new BucketList();
 		d.pushBack("Potato");
 		d.pushBack(1);
 		d.pushBack(2);

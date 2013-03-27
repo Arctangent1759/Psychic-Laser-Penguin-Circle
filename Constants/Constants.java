@@ -13,6 +13,7 @@ public final class Constants{
 	//Board Constants
 	public static final int BOARDHEIGHT=8; //The height of a board
 	public static final int BOARDWIDTH = 8; //The width of a board
+	public static final int WINNING_NETWORK = 7; //Winning network length
 
 
 	//Player Constants

@@ -11,6 +11,9 @@ import DList.*;
 */
 public class HashTable{
 	@SuppressWarnings("unchecked")
+        public static int numX = 0;
+        public static int numY = 0;
+        public static int numO  = 0;
 	protected DList<Object>[] chains;
 	/**
 	*  Constructor of the bucket.
@@ -67,6 +70,7 @@ public class HashTable{
 		keyValuePair.value = value;
 		chains[hash].pushFront(keyValuePair);
 	}
+        
 	public Entry get(Object key){
 		int hash = compress(key.hashCode());
 		DListNode node = chains[hash].getFront();
@@ -79,7 +83,44 @@ public class HashTable{
 		}
 		return null;
 	} 
-
+        
+         public static String randomBoard(){
+            String a = "";
+            for(int length = 0; length<8;length++){
+                for(int width = 0; width<8;width++){
+                    int random = (int)(Math.random()*3);
+                    //empty
+                    if(random == 0){
+                        a = a + "O";
+                        numO++;
+                    }
+                    //white
+                    if(random == 1){
+                        a = a + "X";
+                        numX++;
+                    }
+                    //black
+                    if(random == 2){
+                        a = a + "Y";
+                        numY++;
+                    }
+                }
+            }
+           return a;
+        }
+        public void countCollisions(){
+            int collisions = 0;
+            for(int index = 0; index<chains.length;index++){
+                if(chains[index].length() == 0){
+                    System.out.println("Nothing in bucket on index " + index);
+                    continue;
+                }
+                System.out.println((chains[index].length())-1 + " collisions on index " + index);
+                collisions += chains[index].length()-1;
+            }
+            System.out.println("collisions # is" + collisions);
+        }
+        
 	public static void main(String[] args){
 		HashTable t = new HashTable(6);
 		Testhash h1 = new Testhash("animal");
@@ -100,14 +141,26 @@ public class HashTable{
 		System.out.println(t.get(h3));
 		System.out.println(t.get(h2));
 		System.out.println(t.get(h1));
+                int numBoards = 100;
+                Testhash2[] a = new Testhash2[numBoards];
+                for(int b = 0; b<a.length;b++){
+                    System.out.println(randomBoard());
+                    a[b] = new Testhash2(randomBoard());
+                }
+                HashTable q = new HashTable(numBoards);
+                for(int c = 0; c<a.length;c++){
+                    q.add(a[c], "lulz");
+                }
+                q.countCollisions();
 	}
 }
-class Testhash implements Hashable{
+
+class Testhash{
 	String s;
 public Testhash(String s){
 		this.s=s;
 	}
-	public int getHash(){
+	public int hashCode(){
 		int total=0;
 		for (int i = 0; i<this.s.length(); i++){
 			total+=this.s.charAt(i);
@@ -118,3 +171,30 @@ public Testhash(String s){
 		return s;
 	}
 }
+
+class Testhash2{
+    String s;
+public Testhash2(String s){
+		this.s=s;
+	}
+	public int hashCode(){
+		int total=0;
+                int pow = 1;
+		for(int boardSize = 0; boardSize<64; boardSize++){
+                    if(s.charAt(boardSize) ==  'X'){
+                        total = total + pow*1;
+                    }  
+                    if(s.charAt(boardSize) == 'Y'){
+                        total = total + pow*2;
+                    }
+                    pow *= 3;
+                }
+            return total;
+	}
+	public Object getKey(){
+		return s;
+	}
+}
+
+
+
