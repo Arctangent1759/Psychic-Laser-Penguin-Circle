@@ -10,7 +10,7 @@ import DList.*;
 *
 */
 public class HashTable{
-	protected DList<Entry>[] chains;
+	protected Object[] chains;
 	/**
 	*  Constructor of the bucket.
 	*   @param numBuckets represents expected size of hashTable. 
@@ -33,7 +33,7 @@ public class HashTable{
 				}
 			}
 		}
-		chains = new DList<Entry>[prime];
+		chains = new Object[prime];
 		for (int i = 0; i < prime; i++){
 			chains[i] = new DList<Entry>();
 		}
