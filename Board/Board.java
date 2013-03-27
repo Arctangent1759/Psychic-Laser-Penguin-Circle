@@ -56,7 +56,7 @@ public class Board{
 
 		//Verify that the chip is only being moved 1 step orthogonally or diagonally
 		if (Math.abs(x1-x2)!=1 || Math.abs(y1-y2)!=1){
-			throw new InvalidMoveException("No chip to move from (" + x1 + "," + y1 + ") to (" + x2 + "," + y2 + ").");
+			throw new InvalidMoveException("Invalid move from (" + x1 + "," + y1 + ") to (" + x2 + "," + y2 + ").");
 		}
 
 		//Get the chip at (x1,y1)'s color
@@ -66,7 +66,14 @@ public class Board{
 		//(x2,y2 is occupied, for instace), the exception is passed 
 		//to caller.
 		addChip(currColor,x2,y2);
+
+		//If addChip succeeds, the number of chips will be one greater than it really is.
 		grid[x1][y1]=null;
+		if (currColor==Constants.BLACK){
+			numBlack--;
+		}else if (currColor==Constants.WHITE){
+			numWhite--;
+		}
 	}
 
 
@@ -81,28 +88,42 @@ public class Board{
 	 *
 	**/
 	public void addChip(int color, int x, int y) throws InvalidMoveException{
+		//Update the number of chips.
+		if (color == Constants.WHITE) {
+			numWhite++;
+		}else if (color == Constants.BLACK) {
+			numBlack++;
+		}
+
+		//Enforce the chip limit
+		if (color == Constants.WHITE && numWhite>10) {
+			numWhite--;
+			throw new InvalidMoveException("Too many white chips.");
+		}
+		else if (color == Constants.BLACK && numBlack>10) {
+			numBlack--;
+			throw new InvalidMoveException("Too many black chips.");
+		}
 		//Enforce chip placement rule 3
 		if (hasChip(x,y)){
+			if (color == Constants.WHITE) {
+				numWhite--;
+			}else if (color == Constants.BLACK) {
+				numBlack--;
+			}
 			throw new InvalidMoveException("There is already a chip at (" + x+","+y+").");
 		}
 
 		//Create the new chip
 		grid[x][y]=new Chip(color);
 		
-		if (color == Constants.WHITE) {
-			numWhite++;
-		}
-		else {
-			numBlack++;
-		}
 
 		//Enforce chip placement rules 1, 2, and 4. These are rules dependent on board state.
 		if (!isValid()){
 			grid[x][y]=null; //Revert the board if the move invalidates the board.
 			if (color == Constants.WHITE) {
 				numWhite--;
-			}
-			else {
+			}else if (color == Constants.BLACK) {
 				numBlack--;
 			}
 			throw new InvalidMoveException("Placement rule violated.");
@@ -203,11 +224,6 @@ public class Board{
 			}
 		}
 		return true;
-		
-		//Enforce chip limit. 
-		if (numWhite > MAX_CHIPS || numBlack > MAX_CHIPS) {
-			return false;
-		}
 	}
 
 	/**
