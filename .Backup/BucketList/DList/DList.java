@@ -5,15 +5,15 @@ package HashTable.BucketList.DList;
  * 2. sentinel.prev="tail"
  * 3. sentinel.next="head"
  */
-public class BucketList{
-	protected BucketListNode sentinel;
+public class DList{
+	protected DListNode sentinel;
 	protected int length;
-	protected BucketListNode iterator;
+	protected DListNode iterator;
 
 	//Constuctors
-	public BucketList(){
+	public DList(){
 		this.length=0;
-		this.sentinel = new BucketListNode();
+		this.sentinel = new DListNode();
 		sentinel.next=sentinel;
 		sentinel.prev=sentinel;
 		this.iterator=sentinel;
@@ -21,12 +21,12 @@ public class BucketList{
 
 	//Push/Pop
 	public void pushFront(Object o){
-		sentinel.next=new BucketListNode(o,sentinel,sentinel.next);
+		sentinel.next=new DListNode(o,sentinel,sentinel.next);
 		sentinel.next.next.prev=sentinel.next;
 		this.length++;
 	}
 	public void pushBack(Object o){
-		sentinel.prev=new BucketListNode(o,sentinel.prev,sentinel);
+		sentinel.prev=new DListNode(o,sentinel.prev,sentinel);
 		sentinel.prev.prev.next=sentinel.prev;
 		this.length++;
 	}
@@ -47,7 +47,7 @@ public class BucketList{
 
 	//Itemwise ops
 	public Object getItem(int n){
-		BucketListNode curr=sentinel.next;
+		DListNode curr=sentinel.next;
 		while (n>0){
 			curr=curr.next;
 			n--;
@@ -55,7 +55,7 @@ public class BucketList{
 		return curr.item;
 	}
 	public Object popItem(int n){
-		BucketListNode curr=sentinel.next;
+		DListNode curr=sentinel.next;
 		while (n>0){
 			curr=curr.next;
 			n--;
@@ -66,7 +66,7 @@ public class BucketList{
 		return curr.item;
 	}
 	public void insertItem(int n, Object o){
-		BucketListNode curr=sentinel.next;
+		DListNode curr=sentinel.next;
 		while (n>0){
 			curr=curr.next;
 			n--;
@@ -107,7 +107,7 @@ public class BucketList{
 		if (sentinel.next==sentinel){
 			return null;
 		}
-		BucketListNode curr=sentinel.next;
+		DListNode curr=sentinel.next;
 		String out = "[";
 		while (true){
 			out+=curr.item.toString();

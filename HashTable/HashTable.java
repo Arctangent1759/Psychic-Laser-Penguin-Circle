@@ -10,32 +10,34 @@ import DList.*;
 *
 */
 public class HashTable{
-	protected Object[] chains;
+	@SuppressWarnings("unchecked")
+	protected DList<Object>[] chains;
 	/**
 	*  Constructor of the bucket.
-	*   @param numBuckets represents expected size of hashTable. 
+*   @param numBuckets represents expected size of hashTable. 
 	**/ 
+	@SuppressWarnings("unchecked")
 	public HashTable(int sizeExpected){
 		int prime = sizeExpected;
 		if(prime%2 == 0){
-			prime++;
+			prime++;  
 		}
 		boolean isPrime = false;
 		while(!isPrime){
-			for(int i = 0; i<prime;i++){
+			for(int i = 2; i<prime;i++){
 				if(prime%i == 0){
 					isPrime = false;
 					prime+=2;
 					break;
 				}
 				else{
-					isPrime = true;
+					isPrime = true;   
 				}
 			}
 		}
-		chains = new Object[prime];
+		chains = new DList[prime];
 		for (int i = 0; i < prime; i++){
-			chains[i] = new DList<Entry>();
+			chains[i] = new DList<Object>();
 		}
 	}
 	/**
@@ -65,13 +67,18 @@ public class HashTable{
 		keyValuePair.value = value;
 		chains[hash].pushFront(keyValuePair);
 	}
-	public Object get(Object h){
-		int hash = compress(h.hashCode());
-		Entry keyValuePair = new Entry();
-		keyValuePair.key = h;
-		keyValuePair.value = value;
-		return chains[hash].getItem(h);
-	}
+	public Entry get(Object key){
+		int hash = compress(key.hashCode());
+		DListNode node = chains[hash].getFront();
+		while(node!=null){
+			Entry entry = (Entry)node.item();
+			if(entry.key().equals(key)){
+				return entry;
+			}
+			node = node.next();
+		}
+		return null;
+	} 
 
 	public static void main(String[] args){
 		HashTable t = new HashTable(6);
