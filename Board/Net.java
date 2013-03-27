@@ -25,6 +25,14 @@ public class Net{
 		this.length=length;
 		this.complete=complete;
 	}
+	
+	public int getPlayer() {
+		return player;
+	}
+	
+	public int getLength() {
+		return length;
+	}
 	public String toString(){
 		String color;
 		if (player==Constants.BLACK){
