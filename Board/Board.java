@@ -130,8 +130,7 @@ public class Board{
 		}
 	}
 
-
-
+        
 	/**
 	 *
 	 *	Gets the chip at x,y.
@@ -156,6 +155,8 @@ public class Board{
 	public boolean hasChip(int x, int y){
 		return grid[x][y]!=null;
 	}
+        
+        
 	/**
 	 *
 	 *	Returns whether this Chip a is line of sight with Chip b
@@ -191,6 +192,18 @@ public class Board{
 		//Check 1 is on the path between 2 and 3.
 		return y1==y2+(Math.abs((y2-y3)/(x2-x3)))*(x1-x2);
 	}
+
+                
+        /**
+	 *
+	 * Checks for valid chip location.
+         * 4 rules:
+         * 1. Cannot place chips in corners.
+         * 2. Cannot place in wrong goal.
+         * 3. Cannot place three in contact with each other.
+	 * @return boolean that states if the chip location is valid.
+	 *
+	**/
 
 	public boolean isValid(){
 		//Enforce chip placement rule 1. Cannot place in corners.
@@ -291,6 +304,15 @@ public class Board{
 		return Constants.NULL_PLAYER;
 	}
 
+                
+        /**
+	 *
+	 * Returns a string representation of the board. 
+         * . is empty, X is BLACK, O is WHITE.
+	 * @return a string.
+	 *
+	**/
+
 	public String toString(){
 		String out="";
 		for (int y = 0; y < Constants.BOARDHEIGHT; y++){
@@ -316,7 +338,7 @@ public class Board{
 
 	/**
 	 *
-	 * Returns a list of networks
+	 * Returns a list of the longest networks.
 	 * @return a DList of networks
 	 *
 	**/
@@ -342,6 +364,20 @@ public class Board{
 		}
 		return out;
 	}
+
+                
+        /**
+	 *
+	 * Finds the longest network.
+         * @param x is x value of the chip.
+         * @param y is the y value of the chip.
+         * @param last_direction is the last_direction the chip went in.
+         * @param depth is referring to how far the object goes down.
+         * @param origin_x is referring to the x-coordinate the original goal was in.
+         * @param origin_y is referring to the y-coordinate the original goal was in.
+	 * @return a DList of networks
+	 *
+	**/
 
 	private DList<Net> expandLongestNetFromChip(int x, int y, int last_direction, int depth, int origin_x, int origin_y){
 		//Base cases:
@@ -710,6 +746,36 @@ public class Board{
 		}
 
 	}
+        /**
+	 *
+	 * Returns a hashcode based on base3.
+	 * @return a DList of networks
+	 *
+	**/
+
+        public int hashCode(){
+        String s = toString();
+        int total=0;
+        int pow = 1;
+        for(int boardSize = 0; boardSize<64; boardSize++){
+            if(s.charAt(boardSize) ==  'X'){
+                total = total + pow*1;
+            }  
+            if(s.charAt(boardSize) == 'O'){
+                total = total + pow*2;
+            }
+                pow *= 3;
+            }
+            return total;
+	}
+        
+        /**
+	 *
+	 * Returns the color of a position as a string.
+         * @param integer refers to the location.
+	 * @return a DList of networks
+	 *
+	**/
 
 	private static String colorStr(int c){
 		if (c==Constants.BLACK){
