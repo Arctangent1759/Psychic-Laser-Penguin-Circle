@@ -5,6 +5,7 @@ package player;
 import Constants.Constants;
 import DList.*;
 import HashTable.*;
+import Board.*;
 
 /**
  *  An implementation of an automatic Network player.  Keeps track of moves
@@ -22,7 +23,7 @@ public class MachinePlayer extends Player {
 	public MachinePlayer(int color){
 		this.color = color;
 		this.searchDepth = 5;
-		myName = God;
+		myName = "God";
 		boards = new HashTable(1000); //Test number
   	}
 
@@ -31,7 +32,7 @@ public class MachinePlayer extends Player {
 	public MachinePlayer(int color, int searchDepth) {
 		this.color = color;
 		board = new Board();
-		myName = God;
+		myName = "God";
 		this.searchDepth = searchDepth;
 		boards = new HashTable(1000); //Test number
 	}
@@ -46,19 +47,21 @@ public class MachinePlayer extends Player {
 		this.color = color;
 		this.searchDepth = searchDepth;
 		this.board = board;
-		myName = God;
+		myName = "God";
 		boards = new HashTable(1000); //Test number
 	}
 
-	// Returns a new move by "this" player.  Internally records the move (updates
-	// the internal game board) as a move by "this" player.
+	/** Returns a new move by "this" player.  Internally records the move (updates
+         *  the internal game board) as a move by "this" player.
+         * @return The new Move. 
+        **/
 	public Move chooseMove() {
 		Move dummy_move = new Move(); //Initializer
 		Board copy = board;
 		Move bestMove = chooseOptimalMove(color, Constants.START_ALPHA, 
 						Constants.START_BETA, dummy_move, searchDepth(1000), board);
 		board = copy; // Returns board to what it once was before going down game tree. 
-		board.updateBoard(color, bestMove);
+		updateBoard(color, bestMove);
 		return bestMove;
 	}
 
@@ -68,24 +71,27 @@ public class MachinePlayer extends Player {
 	// player.  This method allows your opponents to inform you of their moves.
 	public boolean opponentMove(Move m) {
 		if (color == Constants.WHITE) {
-			updateBoard(Constants.BLACK, m);
+			return updateBoard(Constants.BLACK, m);
 		}
 		else {
-			updateBoard(Constants.WHITE, m);
+			return updateBoard(Constants.WHITE, m);
 		}
 	}
 
-	// If the Move m is legal, records the move as a move by "this" player
-	// (updates the internal game board) and returns true.  If the move is
-	// illegal, returns false without modifying the internal state of "this"
-	// player.  This method is used to help set up "Network problems" for your
-	// player to solve.	
+	/** If the Move m is legal, records the move as a move by "this" player
+         * (updates the internal game board) and returns true.  If the move is
+	 * illegal, returns false without modifying the internal state of "this"
+	 * player.  This method is used to help set up "Network problems" for your
+	 * player to solve.
+         * @param The move being tested
+         * @return Whether the move is legal or not.
+        **/
 	public boolean forceMove(Move m) {
     	if (color == Constants.BLACK) {
-			updateBoard(Constants.BLACK, m);
+			return updateBoard(Constants.BLACK, m);
 		}
 		else {
-			updateBoard(Constants.WHITE, m);
+			return updateBoard(Constants.WHITE, m);
 		}
 	}
 	
@@ -121,13 +127,14 @@ public class MachinePlayer extends Player {
 	 * @param alpha maximum lower bound for game tree
 	 * @param beta minimum upper bound for game tree
 	 * @param searchDepth how far down the game tree it will search.
+         * @return The optimal move.
 	**/
-	private Score chooseOptimalMove(int color, int alpha, int beta, 
+	private Move chooseOptimalMove(int color, int alpha, int beta, 
 		Move bestMove, int searchDepth, Board board) {
 		// I had an extremely hard time with this. If you guys can fix it that would be great :D
 		
 		Board copy = board; //Saving board before anything is called.
-		if (searchDepth == 0 || scoreHolder.score == Constants.START_BETA) {
+		if (searchDepth == 0 || evalBoard(color,board) == Constants.START_BETA) {
 			return bestMove;
 		}
 		
@@ -136,7 +143,7 @@ public class MachinePlayer extends Player {
 				//Step implementation
 				for (int x1 = 0; x1 < Constants.BOARDWIDTH; x1++) {
 					for (int y1 = 0; y1 < Constants.BOARDHEIGHT; y1++) {
-						if (!board.hasChip(x1,y1) || board.getChip(x1,y1) != color) {
+						if (!board.hasChip(x1,y1) || board.getChip(x1,y1).getColor() != color) {
 							continue; //No chip, nothing to see here move on.
 						}
 						else {
@@ -144,7 +151,7 @@ public class MachinePlayer extends Player {
 								for (int y2 = 0; y2 < Constants.BOARDHEIGHT; y2++) {
 									board = copy; // reverts every sibling.
 									Move step = new Move(x2,y2,x1,y1);
-									board.moveChip(x1,y1,x2,y2);
+									updateBoard(color,step);
 									
 									if (!board.hasChip(x2,y2) && board.hasChip(x1,y1)) {
 										continue; //Invalid move, nothing to see here move along.
@@ -154,7 +161,7 @@ public class MachinePlayer extends Player {
 									// Changing alpha during player's turn.  
 									if (score >= alpha) {
 										alpha = score;
-										bestMove = move;
+										bestMove = step;
 									}
 									// Pruning
 									if (beta <= alpha) {
@@ -170,10 +177,11 @@ public class MachinePlayer extends Player {
 									}
 								}
 							}
-							return bestMove;
+
 						}
 					}
 				}
+                                return bestMove;
 			}
 						
 			else {
@@ -184,7 +192,7 @@ public class MachinePlayer extends Player {
 					for (int y = 0; y < Constants.BOARDHEIGHT; y++) {
 						board = copy; // reverts every sibling.
 						Move move = new Move(x,y);
-						board.addChip(x,y);
+						updateBoard(color,move);
 						if (!board.hasChip(x,y)) {
 							continue; //Invalid chip, nothing to see here move on.
 						}
@@ -209,8 +217,8 @@ public class MachinePlayer extends Player {
 						}
 					}
 				}
-				return bestMove;
 			}
+                        return bestMove;
 		}
 		//Opponent's turn
 		else {
@@ -221,7 +229,7 @@ public class MachinePlayer extends Player {
 				if (board.isFull()) {
 					for (int x1 = 0; x1 < Constants.BOARDWIDTH; x1++) {
 						for (int y1 = 0; y1 < Constants.BOARDHEIGHT; y1++) {
-							if (!board.hasChip(x1,y1) || board.getChip(x1,y1) != color) {
+							if (!board.hasChip(x1,y1) || board.getChip(x1,y1).getColor() != color) {
 								continue; //No chip, nothing to see here move on.
 							}
 							else {
@@ -229,7 +237,7 @@ public class MachinePlayer extends Player {
 									for (int y2 = 0; y2 < Constants.BOARDHEIGHT; y2++) {
 										board = copy; // reverts every sibling.
 										Move step = new Move(x2,y2,x1,y1);
-										board.moveChip(x1,y1,x2,y2);
+										updateBoard(color,step);
 									
 										if (!board.hasChip(x2,y2) && board.hasChip(x1,y1)) {
 											continue; //Invalid move, nothing to see here move along.
@@ -239,7 +247,7 @@ public class MachinePlayer extends Player {
 										// Changing beta during opponent's turn's turn.  
 										if (score < beta) {
 											beta = score;
-											bestMove = move;
+											bestMove = step;
 										}
 										// Pruning
 										if (beta <= alpha) {
@@ -255,18 +263,18 @@ public class MachinePlayer extends Player {
 										}
 									}
 								}
-								return bestMove;
 							}
 						}
 					}
 				}
+                                return bestMove;
 			}
 			else {
 				for (int x = 0; x < Constants.BOARDWIDTH; x++) {
 					for (int y = 0; y < Constants.BOARDHEIGHT; y++) {
 						board = copy; // reverts every sibling.
 						Move move = new Move(x,y);
-						board.addChip(x,y);
+						updateBoard(color,move);
 						if (!board.hasChip(x,y)) {
 							continue; //Invalid chip, nothing to see here move on.
 						}
@@ -334,8 +342,8 @@ public class MachinePlayer extends Player {
 	 * @param Move m, the move with which it wants to update the internal board.
 	 * @return True if move is valid, false otherwise. 
 	**/
-	private boolean updateBoard(int color, Move m) {
-		if (m.moveKind == move.ADD) {
+	private boolean updateBoard(int color, Move move) {
+		if (move.moveKind == Move.ADD) {
 			try {
 				board.addChip(color,move.x1,move.y1);
 			}
@@ -344,11 +352,11 @@ public class MachinePlayer extends Player {
 			}
 			return true;
 		}
-		else if (m.moveKind == move.STEP) {
+		else if (move.moveKind == Move.STEP) {
 			try {
-				board.addChip(color ,move.x2, move.y2, move.x1, move.y1);
+				board.moveChip(move.x1,move.y1,move.x2,move.y2);
 			}
-			catch (InvalidMoveException e) {
+			catch (InvalidMoveException e){
 				return false;
 			}
 			return true;

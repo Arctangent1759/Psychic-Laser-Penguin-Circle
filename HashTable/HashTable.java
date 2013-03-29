@@ -137,14 +137,14 @@ public class HashTable{
 		t.add(h6,"narwahl");
 		System.out.println(t.get(h6));
 		System.out.println(t.get(h5));
-		System.out.println(t.get(h4));
+		System.out.println
+                        (t.get(h4));
 		System.out.println(t.get(h3));
 		System.out.println(t.get(h2));
 		System.out.println(t.get(h1));
-                int numBoards = 100;
+                int numBoards = 1000000;
                 Testhash2[] a = new Testhash2[numBoards];
                 for(int b = 0; b<a.length;b++){
-                    System.out.println(randomBoard());
                     a[b] = new Testhash2(randomBoard());
                 }
                 HashTable q = new HashTable(numBoards);

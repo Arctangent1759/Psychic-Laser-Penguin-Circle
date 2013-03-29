@@ -173,6 +173,15 @@ public class Board{
 		return !(x1==x2 || y1==y2 || Math.abs((y2-y1)/(x2-x1))==1);
 	}
 	
+        /**
+         *      Returns whether the board is full or not. This is when 10 white chips
+         *      and 10 black chips are on the field.
+         * 
+         **/
+        public boolean isFull(){
+            return numWhite==Constants.MAX_CHIPS && numBlack == Constants.MAX_CHIPS;
+        }
+        
 	/**
 	 *
 	 *	Returns whether chip 1 interrupts the path between chips 2 and 3.

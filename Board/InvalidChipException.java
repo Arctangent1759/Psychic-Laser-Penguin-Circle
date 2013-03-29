@@ -1,16 +1,16 @@
-package board;
+package Board;
 
 public class InvalidChipException extends Exception{
 	/* InvalidNodeException.java */
 
 /**
- *  Implements an Exception that signals an attempt to use an invalid ListNode.
+ *  Implements an Exception that signals an attempt to use an invalid chip
  */
   protected InvalidChipException() {
     super();
   }
 
-  protected InvalidNodeException(String s) {
+  protected InvalidChipException(String s){
     super(s);
   }
 }
