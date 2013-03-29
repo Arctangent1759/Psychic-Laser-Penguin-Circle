@@ -40,7 +40,6 @@ public class Board{
 		numBlack = 0;
 	}
 
-
 	/**
 	 *
 	 *	Moves chip c to point x,y
@@ -141,6 +140,13 @@ public class Board{
 	**/
 	public Chip getChip(int x, int y){
 		return grid[x][y];
+	}
+	/**
+	 * Returns the state of the board whether its in Adding phase or 
+	 * stepping phase. 
+	**/
+	public boolean isFull() {
+		return (numWhite == MAX_CHIPS && numBlack == MAX_CHIPS);
 	}
 
 
@@ -753,7 +759,7 @@ public class Board{
 	 *
 	**/
 
-        public int hashCode(){
+    public int hashCode(){
         String s = toString();
         int total=0;
         int pow = 1;
@@ -769,7 +775,7 @@ public class Board{
             return total;
 	}
         
-        /**
+    /**
 	 *
 	 * Returns the color of a position as a string.
          * @param integer refers to the location.
