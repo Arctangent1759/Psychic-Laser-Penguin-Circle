@@ -40,6 +40,7 @@ public class Board{
 		numBlack = 0;
 	}
 
+
 	/**
 	 *
 	 *	Moves chip c to point x,y
@@ -129,6 +130,10 @@ public class Board{
 		}
 	}
 
+	public void removeChip(int x, int y){
+		grid[x][y]=null;
+	}
+
         
 	/**
 	 *
@@ -140,13 +145,6 @@ public class Board{
 	**/
 	public Chip getChip(int x, int y){
 		return grid[x][y];
-	}
-	/**
-	 * Returns the state of the board whether its in Adding phase or 
-	 * stepping phase. 
-	**/
-	public boolean isFull() {
-		return (numWhite == MAX_CHIPS && numBlack == MAX_CHIPS);
 	}
 
 
@@ -200,13 +198,13 @@ public class Board{
 	}
 
                 
-        /**
+	/**
 	 *
 	 * Checks for valid chip location.
-         * 4 rules:
-         * 1. Cannot place chips in corners.
-         * 2. Cannot place in wrong goal.
-         * 3. Cannot place three in contact with each other.
+	 * 4 rules:
+	 * 1. Cannot place chips in corners.
+	 * 2. Cannot place in wrong goal.
+	 * 3. Cannot place three in contact with each other.
 	 * @return boolean that states if the chip location is valid.
 	 *
 	**/
@@ -314,7 +312,7 @@ public class Board{
         /**
 	 *
 	 * Returns a string representation of the board. 
-         * . is empty, X is BLACK, O is WHITE.
+	 * . is empty, X is BLACK, O is WHITE.
 	 * @return a string.
 	 *
 	**/
@@ -759,7 +757,7 @@ public class Board{
 	 *
 	**/
 
-    public int hashCode(){
+	public int hashCode(){
         String s = toString();
         int total=0;
         int pow = 1;
@@ -775,7 +773,7 @@ public class Board{
             return total;
 	}
         
-    /**
+        /**
 	 *
 	 * Returns the color of a position as a string.
          * @param integer refers to the location.
