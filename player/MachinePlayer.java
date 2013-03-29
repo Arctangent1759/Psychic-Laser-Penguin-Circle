@@ -57,7 +57,8 @@ public class MachinePlayer extends Player {
         **/
 	public Move chooseMove() {
 		Move dummy_move = new Move(); //Initializer
-		Board copy = board;
+		Board copy = new Board();
+		copy = board;
 		Move bestMove = chooseOptimalMove(color, Constants.START_ALPHA, 
 						Constants.START_BETA, dummy_move, searchDepth(1000), board);
 		board = copy; // Returns board to what it once was before going down game tree. 
@@ -126,6 +127,7 @@ public class MachinePlayer extends Player {
 	 * @param color the side in which the move will be determined.
 	 * @param alpha maximum lower bound for game tree
 	 * @param beta minimum upper bound for game tree
+	 * @param bestMove the best Move that has been currently made. 
 	 * @param searchDepth how far down the game tree it will search.
          * @return The optimal move.
 	**/
@@ -133,14 +135,15 @@ public class MachinePlayer extends Player {
 		Move bestMove, int searchDepth, Board board) {
 		// I had an extremely hard time with this. If you guys can fix it that would be great :D
 		
-		Board copy = board; //Saving board before anything is called.
+		Board copy = new Board(); //Saving board before anything is called.
+		copy = board;
 		if (searchDepth == 0 || evalBoard(color,board) == Constants.START_BETA) {
 			return bestMove;
 		}
 		
 		else if (color == this.color) {
 			if (board.isFull()) {
-				//Step implementation
+				//Step implementation	
 				for (int x1 = 0; x1 < Constants.BOARDWIDTH; x1++) {
 					for (int y1 = 0; y1 < Constants.BOARDHEIGHT; y1++) {
 						if (!board.hasChip(x1,y1) || board.getChip(x1,y1).getColor() != color) {
@@ -151,16 +154,15 @@ public class MachinePlayer extends Player {
 								for (int y2 = 0; y2 < Constants.BOARDHEIGHT; y2++) {
 									board = copy; // reverts every sibling.
 									Move step = new Move(x2,y2,x1,y1);
-									updateBoard(color,step);
-									
+									updateBoard(color,step);									
 									if (!board.hasChip(x2,y2) && board.hasChip(x1,y1)) {
 										continue; //Invalid move, nothing to see here move along.
 									}
-									board = copy; // reverts every child node. 
+								
 									int score = evalBoard(color, board);
-									// Changing alpha during player's turn.  
-									if (score >= alpha) {
-										alpha = score;
+									// Changing beta during opponent's turn's turn.  
+									if (score < beta) {
+										beta = score;
 										bestMove = step;
 									}
 									// Pruning
@@ -177,11 +179,10 @@ public class MachinePlayer extends Player {
 									}
 								}
 							}
-
 						}
 					}
 				}
-                                return bestMove;
+				return bestMove;
 			}
 						
 			else {
@@ -217,57 +218,52 @@ public class MachinePlayer extends Player {
 						}
 					}
 				}
+			return bestMove;	
 			}
-                        return bestMove;
 		}
 		//Opponent's turn
 		else {
-			board = copy;
 			if (board.isFull()) {
 				//Step implementation	
-				
-				if (board.isFull()) {
-					for (int x1 = 0; x1 < Constants.BOARDWIDTH; x1++) {
-						for (int y1 = 0; y1 < Constants.BOARDHEIGHT; y1++) {
-							if (!board.hasChip(x1,y1) || board.getChip(x1,y1).getColor() != color) {
-								continue; //No chip, nothing to see here move on.
-							}
-							else {
-								for (int x2 = 0; x2 < Constants.BOARDWIDTH; x2++) {
-									for (int y2 = 0; y2 < Constants.BOARDHEIGHT; y2++) {
-										board = copy; // reverts every sibling.
-										Move step = new Move(x2,y2,x1,y1);
-										updateBoard(color,step);
-									
-										if (!board.hasChip(x2,y2) && board.hasChip(x1,y1)) {
-											continue; //Invalid move, nothing to see here move along.
-										}
-									
-										int score = evalBoard(color, board);
-										// Changing beta during opponent's turn's turn.  
-										if (score < beta) {
-											beta = score;
-											bestMove = step;
-										}
-										// Pruning
-										if (beta <= alpha) {
-											break;
-										}
+				for (int x1 = 0; x1 < Constants.BOARDWIDTH; x1++) {
+					for (int y1 = 0; y1 < Constants.BOARDHEIGHT; y1++) {
+						if (!board.hasChip(x1,y1) || board.getChip(x1,y1).getColor() != color) {
+							continue; //No chip, nothing to see here move on.
+						}
+						else {
+							for (int x2 = 0; x2 < Constants.BOARDWIDTH; x2++) {
+								for (int y2 = 0; y2 < Constants.BOARDHEIGHT; y2++) {
+									board = copy; // reverts every sibling.
+									Move step = new Move(x2,y2,x1,y1);
+									updateBoard(color,step);									
+									if (!board.hasChip(x2,y2) && board.hasChip(x1,y1)) {
+										continue; //Invalid move, nothing to see here move along.
+									}
+								
+									int score = evalBoard(color, board);
+									// Changing beta during opponent's turn's turn.  
+									if (score < beta) {
+										beta = score;
+										bestMove = step;
+									}
+									// Pruning
+									if (beta <= alpha) {
+										break;
+									}
 						
-										// Moving down the game tree
-										else if (color == Constants.BLACK) {
-											return chooseOptimalMove(Constants.WHITE, alpha, beta, bestMove, searchDepth-1, board);
-										}
-										else {
-											return chooseOptimalMove(Constants.BLACK, alpha, beta, bestMove, searchDepth-1, board);
-										}
+									// Moving down the game tree
+									else if (color == Constants.BLACK) {
+										return chooseOptimalMove(Constants.WHITE, alpha, beta, bestMove, searchDepth-1, board);
+									}
+									else {
+										return chooseOptimalMove(Constants.BLACK, alpha, beta, bestMove, searchDepth-1, board);
 									}
 								}
 							}
 						}
 					}
 				}
-                                return bestMove;
+				return bestMove;
 			}
 			else {
 				for (int x = 0; x < Constants.BOARDWIDTH; x++) {
