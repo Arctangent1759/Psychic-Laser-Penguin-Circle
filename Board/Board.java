@@ -25,21 +25,38 @@ import java.io.*;
 public class Board{	
 
 
+	protected Chip[][] grid;
+	protected int numWhite;
+	protected int numBlack;
+
 	/**
 	 *
 	 *	Constructs a new Board.
 	 *
 	**/
-	protected Chip[][] grid;
-	protected int numWhite;
-	protected int numBlack;
-	
 	public Board() {
 		grid = new Chip[Constants.BOARDWIDTH][Constants.BOARDHEIGHT];
 		numWhite = 0;
 		numBlack = 0;
 	}
 
+	/**
+	 *
+	 *	Board copy constructor
+	 *	@param b the board to be copied
+	 *
+	**/
+	public Board(Board b) {
+		grid = new Chip[Constants.BOARDWIDTH][Constants.BOARDHEIGHT];
+		numWhite = b.numWhite;
+		numBlack = b.numBlack;
+		for (int x = 0; x < Constants.BOARDWIDTH; x++){
+			for (int y = 0; y < Constants.BOARDHEIGHT; y++){
+				grid[x][y]=b.grid[x][y];
+			}
+		}
+
+	}
 
 	/**
 	 *
@@ -585,7 +602,8 @@ public class Board{
 
 
 	public static void main(String[] args){
-		Board b = new Board();
+		Board c = new Board();
+		Board b = new Board(c);
 		try{
 			b.addChip(1,0,1);
 			b.addChip(1,0,2);
