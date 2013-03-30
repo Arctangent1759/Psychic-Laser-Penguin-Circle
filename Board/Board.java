@@ -20,6 +20,7 @@ package Board;
 import Constants.Constants;
 import DList.*;
 import java.io.*;
+import player.Move;
 
 
 public class Board{	
@@ -60,12 +61,67 @@ public class Board{
 
 	/**
 	 *
+	 *	Incorporates a move into the internal game board.
+	 *	@param m is the move that the board is incorporating.
+	 *	@param color is the color of the player performing the move.
+	 *	@throws InvalidMoveException when a move makes a board invalid.
+	 *
+	**/
+	public void doMove(Move m, int color) throws InvalidMoveException{
+		switch (m.moveKind){
+			case Move.ADD:
+				addChip(color,m.x1,m.y1);
+				break;
+			case Move.STEP:
+				moveChip(m.x1,m.y1,m.x2,m.y2,color);
+				break;
+			case Move.QUIT:
+				break;
+			default:
+				throw new InvalidMoveException("Move type not recognized.");
+		}
+	}
+
+	/**
+	 *
+	 *	Undo a move in the internal game board. 
+	 *
+	 *	NEVER CALL BEFORE CALLING Board.doMove() WITH THE MOVE FIRST! 
+	 *	Board.doMove() MUST NOT THROW AN EXCEPTION. FAILURE TO ADHERE 
+	 *	TO THIS WILL CAUSE VIOLATION OF INVARIANTS.
+	 *
+	 *	@param m is the move that the board is incorporating.
+	 *	@param color is the color of the player performing the move.
+	 *	@throws InvalidMoveException when a move makes a board invalid.
+	 *
+	**/
+	public void undoMove(Move m, int color) throws InvalidMoveException{
+		switch (m.moveKind){
+			case Move.ADD:
+				removeChip(m.x1,m.y1);
+				break;
+			case Move.STEP:
+				moveChip(m.x2,m.y2,m.x1,m.y1,color);
+				break;
+			case Move.QUIT:
+				break;
+			default:
+				throw new InvalidMoveException("Move type not recognized.");
+		}
+	}
+
+
+
+	/**
+	 *
 	 *	Moves chip c to point x,y
 	 *	@param x1,x2 the coordinates of the chip to be moved.
 	 *	@param x1,x2 the coordinates of the chip's destination.
+	 *	@param color the color of the player placing the chip
+	 *	@throws InvalidMoveException when a move makes a board invalid.
 	 *
 	**/
-	public void moveChip(int x1, int y1, int x2, int y2) throws InvalidMoveException{
+	public void moveChip(int x1, int y1, int x2, int y2, int color) throws InvalidMoveException{
 		if (numWhite!=Constants.MAX_CHIPS || numBlack!=Constants.MAX_CHIPS){
 			throw new InvalidMoveException("Tried to move chip before maximum number of chips have been placed.");
 		}
@@ -73,6 +129,10 @@ public class Board{
 		//Make sure there's a chip at (x1,y1)
 		if (!hasChip(x1,y1)){
 			throw new InvalidMoveException("No chip to move from (" + x1 + "," + y1 + ") to (" + x2 + "," + y2 + ").");
+		}
+
+		if (getChip(x1,y1).getColor()!=color){
+			throw new InvalidMoveException("Tried to move chip of the wrong color.");
 		}
 
 		//Verify that the chip is only being moved 1 step orthogonally or diagonally
@@ -626,7 +686,7 @@ public class Board{
 			b.addChip(0,1,4);
 			b.addChip(0,2,4);
 			Constants.print(b);
-			b.moveChip(3,5,3,4);
+			b.moveChip(3,5,3,4,0);
 		}catch(InvalidMoveException e){
 			Constants.print(e);
 			Constants.print(b);
