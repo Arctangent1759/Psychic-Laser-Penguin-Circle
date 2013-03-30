@@ -49,31 +49,52 @@ public class Board{
 	 *
 	**/
 	public void moveChip(int x1, int y1, int x2, int y2) throws InvalidMoveException{
+		if (numWhite!=Constants.MAX_CHIPS || numBlack!=Constants.MAX_CHIPS){
+			throw new InvalidMoveException("Tried to move chip before maximum number of chips have been placed.");
+		}
+
 		//Make sure there's a chip at (x1,y1)
 		if (!hasChip(x1,y1)){
 			throw new InvalidMoveException("No chip to move from (" + x1 + "," + y1 + ") to (" + x2 + "," + y2 + ").");
 		}
 
 		//Verify that the chip is only being moved 1 step orthogonally or diagonally
-		if (Math.abs(x1-x2)!=1 || Math.abs(y1-y2)!=1){
+		if (Math.abs(x1-x2)>1 || Math.abs(y1-y2)>1 || (Math.abs(x1-x2)==0 && Math.abs(y1-y2)==0)){
 			throw new InvalidMoveException("Invalid move from (" + x1 + "," + y1 + ") to (" + x2 + "," + y2 + ").");
 		}
 
 		//Get the chip at (x1,y1)'s color
-		int currColor = getChip(x1,x2).getColor();
+		int currColor = getChip(x1,y1).getColor();
 
-		//Copy the chip to (x2,y2). If doing so throws an exception 
-		//(x2,y2 is occupied, for instace), the exception is passed 
-		//to caller.
-		addChip(currColor,x2,y2);
 
 		//If addChip succeeds, the number of chips will be one greater than it really is.
-		grid[x1][y1]=null;
 		if (currColor==Constants.BLACK){
 			numBlack--;
 		}else if (currColor==Constants.WHITE){
 			numWhite--;
 		}
+
+		//Store the chip being moved.
+		Chip swapChip = grid[x1][y1];
+		grid[x1][y1]=null;
+
+		//Copy the chip to (x2,y2). If doing so throws an exception 
+		//(x2,y2 is occupied, for instace), the exception is passed 
+		//to caller.
+		try{
+			addChip(currColor,x2,y2);
+		}catch (InvalidMoveException e){
+			//Revert the state of the board to before the move was made if a rule violation is found.
+			if (currColor==Constants.BLACK){
+				numBlack++;
+			}else if (currColor==Constants.WHITE){
+				numWhite++;
+			}
+			//Replace the moved chip.
+			grid[x1][y1]=swapChip;
+			throw e;
+		}
+
 	}
 
 
@@ -539,8 +560,61 @@ public class Board{
 		return out;
 	}
 
+	/**
+	 *
+	 * Returns a hashcode based on base3.
+	 * @return a DList of networks
+	 *
+	**/
+
+	public int hashCode(){
+        String s = toString();
+        int total=0;
+        int pow = 1;
+        for(int boardSize = 0; boardSize<64; boardSize++){
+            if(s.charAt(boardSize) ==  'X'){
+                total = total + pow*1;
+            }  
+            if(s.charAt(boardSize) == 'O'){
+                total = total + pow*2;
+            }
+                pow *= 3;
+            }
+            return total;
+	}
+
+
 	public static void main(String[] args){
-		testNetworkGetterInteractive();
+		Board b = new Board();
+		try{
+			b.addChip(1,0,1);
+			b.addChip(1,0,2);
+			b.addChip(1,0,4);
+			b.addChip(1,0,5);
+			b.addChip(1,3,1);
+			b.addChip(1,3,2);
+			b.addChip(1,3,4);
+			b.addChip(1,3,5);
+			b.addChip(1,5,1);
+			b.addChip(1,5,2);
+			b.addChip(0,1,0);
+			b.addChip(0,2,0);
+			b.addChip(0,4,0);
+			b.addChip(0,6,0);
+			b.addChip(0,1,2);
+			b.addChip(0,2,2);
+			b.addChip(0,4,2);
+			b.addChip(0,6,2);
+			b.addChip(0,1,4);
+			b.addChip(0,2,4);
+			Constants.print(b);
+			b.moveChip(3,5,3,4);
+		}catch(InvalidMoveException e){
+			Constants.print(e);
+			Constants.print(b);
+			System.exit(1);
+		}
+		Constants.print(b);
 	}
 
 	//Test packages
@@ -745,6 +819,7 @@ public class Board{
 
 	//Util
 	private static void testAdd(Board b,int color, int x,int y){
+
 		String colorStr="";
 		if (color == Constants.BLACK){
 			colorStr="black";
@@ -758,28 +833,6 @@ public class Board{
 			Constants.print(e);
 		}
 
-	}
-        /**
-	 *
-	 * Returns a hashcode based on base3.
-	 * @return a DList of networks
-	 *
-	**/
-
-	public int hashCode(){
-        String s = toString();
-        int total=0;
-        int pow = 1;
-        for(int boardSize = 0; boardSize<64; boardSize++){
-            if(s.charAt(boardSize) ==  'X'){
-                total = total + pow*1;
-            }  
-            if(s.charAt(boardSize) == 'O'){
-                total = total + pow*2;
-            }
-                pow *= 3;
-            }
-            return total;
 	}
         
         /**
