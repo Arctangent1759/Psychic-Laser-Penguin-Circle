@@ -23,6 +23,7 @@ public class MachinePlayer extends Player {
 	public MachinePlayer(int color){
 		this.color = color;
 		this.searchDepth = 5;
+		board = new Board();
 		myName = "God";
 		boards = new HashTable(1000); //Test number
   	}
