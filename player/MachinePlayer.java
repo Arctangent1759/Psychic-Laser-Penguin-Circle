@@ -136,8 +136,8 @@ public class MachinePlayer extends Player {
 		Move bestMove, int searchDepth, Board board) {
 		// I had an extremely hard time with this. If you guys can fix it that would be great :D
 		
-		Board copy = new Board(); //Saving board before anything is called.
-		copy = board;
+		//Board copy = new Board(); //Saving board before anything is called.
+		//copy = board;
 		if (searchDepth == 0 || evalBoard(color,board) == Constants.START_BETA) {
 			return bestMove;
 		}
@@ -153,7 +153,7 @@ public class MachinePlayer extends Player {
 						else {
 							for (int x2 = 0; x2 < Constants.BOARDWIDTH; x2++) {
 								for (int y2 = 0; y2 < Constants.BOARDHEIGHT; y2++) {
-									board = copy; // reverts every sibling.
+									//board = copy; // reverts every sibling.
 									Move step = new Move(x2,y2,x1,y1);
 									updateBoard(color,step);									
 									if (!board.hasChip(x2,y2) && board.hasChip(x1,y1)) {
@@ -161,10 +161,10 @@ public class MachinePlayer extends Player {
 									}
 								
 									int score = evalBoard(color, board);
+                                                                        revertBoard(color,step);
 									// Changing beta during opponent's turn's turn.  
 									if (score < beta) {
 										beta = score;
-										bestMove = step;
 									}
 									// Pruning
 									if (beta <= alpha) {
@@ -192,7 +192,7 @@ public class MachinePlayer extends Player {
 				// Going through all possible child nodes.
 				for (int x = 0; x < Constants.BOARDWIDTH; x++) {
 					for (int y = 0; y < Constants.BOARDHEIGHT; y++) {
-						board = copy; // reverts every sibling.
+						//board = copy; // reverts every sibling.
 						Move move = new Move(x,y);
 						updateBoard(color,move);
 						if (!board.hasChip(x,y)) {
@@ -200,6 +200,7 @@ public class MachinePlayer extends Player {
 						}
 						
 						int score = evalBoard(color, board);
+                                                revertBoard(color,move);
 						// Changing alpha during player's turn.  
 						if (score >= alpha) {
 							alpha = score;
@@ -234,14 +235,16 @@ public class MachinePlayer extends Player {
 						else {
 							for (int x2 = 0; x2 < Constants.BOARDWIDTH; x2++) {
 								for (int y2 = 0; y2 < Constants.BOARDHEIGHT; y2++) {
-									board = copy; // reverts every sibling.
+									//board = copy; // reverts every sibling.
 									Move step = new Move(x2,y2,x1,y1);
 									updateBoard(color,step);									
 									if (!board.hasChip(x2,y2) && board.hasChip(x1,y1)) {
+                                                                                revertBoard(color,step);
 										continue; //Invalid move, nothing to see here move along.
 									}
 								
 									int score = evalBoard(color, board);
+                                                                        revertBoard(color,step);
 									// Changing beta during opponent's turn's turn.  
 									if (score < beta) {
 										beta = score;
@@ -269,14 +272,16 @@ public class MachinePlayer extends Player {
 			else {
 				for (int x = 0; x < Constants.BOARDWIDTH; x++) {
 					for (int y = 0; y < Constants.BOARDHEIGHT; y++) {
-						board = copy; // reverts every sibling.
+						//board = copy; // reverts every sibling.
 						Move move = new Move(x,y);
 						updateBoard(color,move);
 						if (!board.hasChip(x,y)) {
+                                                        revertBoard(color,move);
 							continue; //Invalid chip, nothing to see here move on.
 						}
 						
 						int score = evalBoard(color , board);
+                                                revertBoard(color,move);
 						// Changing beta during opponent's turn.  
 						if (score < beta) {
 							beta = score;
@@ -340,27 +345,22 @@ public class MachinePlayer extends Player {
 	 * @return True if move is valid, false otherwise. 
 	**/
 	private boolean updateBoard(int color, Move move) {
-		if (move.moveKind == Move.ADD) {
-			try {
-				board.addChip(color,move.x1,move.y1);
-			}
-			catch (InvalidMoveException e) {
-				return false;
-			}
-			return true;
-		}
-		else if (move.moveKind == Move.STEP) {
-			try {
-				board.moveChip(move.x1,move.y1,move.x2,move.y2);
-			}
-			catch (InvalidMoveException e){
-				return false;
-			}
-			return true;
-		}
-		else {
-			return true; //Only Quit, quitting is always a valid move, although it might not be the best.
-		}
+            try{
+		board.doMove(move, color);
+                return true;
+            }
+            catch(InvalidMoveException e){
+                return false;
+            }
 	}
+        private boolean revertBoard(int color, Move move){
+            try{
+                board.doMove(move, color);
+                return true;
+            }
+            catch(InvalidMoveException e){
+                return false;
+            }
+        }
 }                            
 
