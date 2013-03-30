@@ -1,4 +1,4 @@
-package HashTable.BucketList.DList;
+package HashTable.BucketList;
 class BucketListNode{
 	protected Object item;
 	protected BucketListNode next;
