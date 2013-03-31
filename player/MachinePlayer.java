@@ -43,7 +43,7 @@ public class MachinePlayer extends Player {
 	// Returns a new move by "this" player.	Internally records the move (updates
 	// the internal game board) as a move by "this" player.
 	public Move chooseMove() {
-		Move m = chooseBestMove(color,-2,2,searchDepth).move;
+		Move m = chooseBestMove(color,Constants.START_ALPHA,Constants.START_BETA,searchDepth).move;
 		try{
 			board.doMove(m,color);
 		}catch(InvalidMoveException e){
@@ -82,10 +82,7 @@ public class MachinePlayer extends Player {
 
 
 	//Helper functions
-	
 
-	private static int START_ALPHA=-2;
-	private static int START_BETA=2;
 
 	//Use Minimax to recursively finds the optimal move for the player
 	private Best chooseBestMove(int currColor, double alpha, double beta, int depth){
@@ -107,11 +104,11 @@ public class MachinePlayer extends Player {
 		//Otherwise, commence alpha-beta pruning and game tree search
 		if (currColor==this.color){	//Curr Player is Machine
 			if (myBest.score > alpha) {
-				myBest.score=alpha;
+				myBest.score = alpha;
 			}
 		}else{	//Curr Player is human
 			if (myBest.score < beta) {
-				myBest.score=beta;
+				myBest.score = beta;
 			}
 		}
 
@@ -141,14 +138,14 @@ public class MachinePlayer extends Player {
 				System.exit(1);
 			}
 
-			if ((currColor==this.color) && (reply.score >= myBest.score)){ //Curr Player is machine
-				myBest.move=m;
+			if ((currColor==this.color) && (reply.score > myBest.score)){ //Curr Player is machine
+				myBest.move= m;
 				myBest.score=reply.score;
-				alpha=reply.score;
+				alpha = reply.score;
 			}else if(currColor==getOppColor(this.color)){ //Curr Player is human
 				myBest.move=m;
 				myBest.score=reply.score;
-				beta=reply.score;
+				beta = reply.score;
 			}
 			if (alpha>=beta){
 				return myBest;
@@ -193,10 +190,10 @@ public class MachinePlayer extends Player {
 		while (!networks.isEmpty()) {
 			Net network = networks.pop(); 
 			if (network.getPlayer() == getOppColor(color) && network.isComplete()) {
-				return ((double)START_ALPHA);
+				return ((double)Constants.START_ALPHA);
 			}
 			else if (network.getPlayer() == color && network.isComplete()) {
-				return ((double)START_BETA);
+				return ((double)Constants.START_BETA);
 			}
 			else {
 				if (network.getPlayer() == color) {
@@ -210,7 +207,7 @@ public class MachinePlayer extends Player {
 				}
 			}
 		}
-		return ((score / Constants.WINNING_NETWORK) / size)* START_BETA; 
+		return ((score / Constants.WINNING_NETWORK) / size)* Constants.START_BETA; 
 	}
 
 	//Returns opponent color

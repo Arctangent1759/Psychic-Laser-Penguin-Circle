@@ -13,7 +13,7 @@ public final class Constants{
 	//Board Constants
 	public static final int BOARDHEIGHT=8; //The height of a board
 	public static final int BOARDWIDTH = 8; //The width of a board
-	public static final int WINNING_NETWORK = 7; //Winning network length
+	public static final int WINNING_NETWORK = 6; //Winning network length
 
 
 	//Player Constants
@@ -26,12 +26,12 @@ public final class Constants{
 	public static final int MAX_CHIPS=10; //The maximum number of chips in the game
 	
 	// Machine Player Constants
-	public static final int START_ALPHA = -100;
-	public static final int START_BETA = 100;
+	public static final int START_ALPHA = -2;
+	public static final int START_BETA = 2;
 
 
 	//Debugging and misc.
-	public static final boolean DEBUG=true; //Used to disable unwanted debug output
+	public static final boolean DEBUG=false; //Used to disable unwanted debug output
 
 	/**
 	 *
