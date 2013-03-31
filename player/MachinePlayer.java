@@ -138,7 +138,7 @@ public class MachinePlayer extends Player {
 				System.exit(1);
 			}
 
-			if ((currColor==this.color) && (reply.score > myBest.score)){ //Curr Player is machine
+			if ((currColor==this.color) && (reply.score >= myBest.score)){ //Curr Player is machine
 				myBest.move= m;
 				myBest.score=reply.score;
 				alpha = reply.score;
@@ -197,17 +197,17 @@ public class MachinePlayer extends Player {
 			}
 			else {
 				if (network.getPlayer() == color) {
-					score += network.getLength();
+					score += (network.getLength() * network.getLength());
 				}
 				else if (network.getPlayer() == getOppColor(color)) {
-					score -= network.getLength();
+					score -= (network.getLength() * network.getLength());
 				}
 				else {
 					Constants.print("This should never happen.");
 				}
 			}
 		}
-		return ((score / Constants.WINNING_NETWORK) / size)* Constants.START_BETA; 
+		return ((score / (Constants.WINNING_NETWORK * Constants.WINNING_NETWORK)) / size)* Constants.START_BETA; 
 	}
 
 	//Returns opponent color
