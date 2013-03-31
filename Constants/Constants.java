@@ -31,7 +31,7 @@ public final class Constants{
 
 
 	//Debugging and misc.
-	public static final boolean DEBUG=true; //Used to disable unwanted debug output
+	public static final boolean DEBUG=false; //Used to disable unwanted debug output
 
 	/**
 	 *
