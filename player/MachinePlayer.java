@@ -188,11 +188,18 @@ public class MachinePlayer extends Player {
 		int size = networks.length();
 		double score = 0;
 		while (!networks.isEmpty()) {
-			Net network = networks.pop(); 
+			Net network = networks.pop();
+			/**
+			if (boardCache.get(board.hashCode()) != null) {
+				return ((double) boardCache.get(board.hashCode()).value());
+			}
+			**/
 			if (board.getWinner() == getOppColor(color)) {
+				//boardCache.add(board.hashCode(), (double)Constants.START_ALPHA);
 				return ((double)Constants.START_ALPHA);
 			}
 			else if (board.getWinner() == color) {
+				//boardCache.add(board.hashCode(), (double)Constants.START_BETA);
 				return ((double)Constants.START_BETA);
 			}
 			else {
@@ -221,9 +228,12 @@ public class MachinePlayer extends Player {
 				}
 			}
 		}
-		return ((score / (((double) Constants.WINNING_NETWORK) * 
+		score = ((score / (((double) Constants.WINNING_NETWORK) * 
 			   ((double) Constants.WINNING_NETWORK))) / size * 
-			   ((double)Constants.START_BETA); 
+			   ((double)Constants.START_BETA)); 
+		//boardCache.add(board.hashCode(), score);
+		return score;
+		
 	}
 
 	//Returns opponent color
