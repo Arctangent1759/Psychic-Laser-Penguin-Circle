@@ -434,12 +434,11 @@ public class Board{
 	**/
 	public int getWinner(){
 		DList<Net> networks = getLongestNetworks();
-		DListNode<Net> curr = networks.getFront();
-		while (curr!=null){
-			if (curr.item().complete){
-				return curr.item().player;
+		while (!networks.isEmpty()){
+			Net network = networks.pop();
+			if (network.isComplete()){
+				return network.getPlayer();
 			}
-			curr=curr.next();
 		}
 		return Constants.NULL_PLAYER;
 	}

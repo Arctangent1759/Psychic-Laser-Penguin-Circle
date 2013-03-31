@@ -189,25 +189,41 @@ public class MachinePlayer extends Player {
 		double score = 0;
 		while (!networks.isEmpty()) {
 			Net network = networks.pop(); 
-			if (network.getPlayer() == getOppColor(color) && network.isComplete()) {
+			if (board.getWinner() == getOppColor(color)) {
 				return ((double)Constants.START_ALPHA);
 			}
-			else if (network.getPlayer() == color && network.isComplete()) {
+			else if (board.getWinner() == color) {
 				return ((double)Constants.START_BETA);
 			}
 			else {
 				if (network.getPlayer() == color) {
-					score += (network.getLength() * network.getLength());
+					if (network.getLength() <= Constants.WINNING_NETWORK) {
+						score += (network.getLength() * network.getLength());
+					}
+					else {
+						score += (((double)network.getLength())/
+								 (Constants.WINNING_NETWORK) * 
+								 (network.getLength())/(Constants.WINNING_NETWORK));
+					}
 				}
 				else if (network.getPlayer() == getOppColor(color)) {
-					score -= (network.getLength() * network.getLength());
+					if (network.getLength() <= Constants.WINNING_NETWORK) {
+						score -= (network.getLength() * network.getLength());
+					}
+					else {
+						score -= (((double)network.getLength())/
+								 (Constants.WINNING_NETWORK) * 
+								 (network.getLength())/(Constants.WINNING_NETWORK));
+					}
 				}
 				else {
 					Constants.print("This should never happen.");
 				}
 			}
 		}
-		return ((score / (Constants.WINNING_NETWORK * Constants.WINNING_NETWORK)) / size)* Constants.START_BETA; 
+		return ((score / (((double) Constants.WINNING_NETWORK) * 
+			   ((double) Constants.WINNING_NETWORK))) / size * 
+			   ((double)Constants.START_BETA); 
 	}
 
 	//Returns opponent color
