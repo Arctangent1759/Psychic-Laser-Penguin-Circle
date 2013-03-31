@@ -106,9 +106,13 @@ public class MachinePlayer extends Player {
 
 		//Otherwise, commence alpha-beta pruning and game tree search
 		if (currColor==this.color){	//Curr Player is Machine
-			myBest.score=alpha;
+			if (myBest.score > alpha) {
+				myBest.score=alpha;
+			}
 		}else{	//Curr Player is human
-			myBest.score=beta;
+			if (myBest.score < beta) {
+				myBest.score=beta;
+			}
 		}
 
 		//Get all moves
@@ -183,13 +187,30 @@ public class MachinePlayer extends Player {
 	//Returns the score of the current board
 	//Scores go from -2 to 2. All scores above 1 are winning moves, and all scores below -1 are losing moves.
 	private double scoreBoard(int depth){
-		if (board.getWinner()==this.color){
-			return 1.0+(((double)depth)/searchDepth);
-		}else if (board.getWinner()==getOppColor(this.color)){
-			return -1.0-(((double)(searchDepth-depth))/searchDepth);
-		}else{
-			return 0;
+		DList<Net> networks = board.getLongestNetworks();
+		int size = networks.length();
+		double score = 0;
+		while (!networks.isEmpty()) {
+			Net network = networks.pop(); 
+			if (network.getPlayer() == getOppColor(color) && network.isComplete()) {
+				return ((double)START_ALPHA);
+			}
+			else if (network.getPlayer() == color && network.isComplete()) {
+				return ((double)START_BETA);
+			}
+			else {
+				if (network.getPlayer() == color) {
+					score += network.getLength();
+				}
+				else if (network.getPlayer() == getOppColor(color)) {
+					score -= network.getLength();
+				}
+				else {
+					Constants.print("This should never happen.");
+				}
+			}
 		}
+		return ((score / Constants.WINNING_NETWORK) / size)* START_BETA; 
 	}
 
 	//Returns opponent color

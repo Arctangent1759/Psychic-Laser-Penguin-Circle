@@ -33,6 +33,10 @@ public class Net{
 	public int getLength() {
 		return length;
 	}
+	
+	public boolean isComplete() {
+		return complete;
+	}
 	public String toString(){
 		String color;
 		if (player==Constants.BLACK){
