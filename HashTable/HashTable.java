@@ -21,7 +21,7 @@ public class HashTable{
 	**/ 
 	@SuppressWarnings("unchecked")
 	public HashTable(int sizeExpected){
-		int prime = sizeExpected;
+		int prime = (int)(sizeExpected*(4.0/3.0));
 		if(prime%2 == 0){
 			prime++;  
 		}
