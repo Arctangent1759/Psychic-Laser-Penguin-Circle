@@ -1,366 +1,214 @@
 /* MachinePlayer.java */
 
 package player;
-
-import Constants.Constants;
-import DList.*;
-import HashTable.*;
 import Board.*;
+import HashTable.*;
+import DList.*;
+import Constants.Constants;
 
 /**
- *  An implementation of an automatic Network player.  Keeps track of moves
- *  made by both players.  Can select a move for itself.
+ *	An implementation of an automatic Network player.	Keeps track of moves
+ *	made by both players.	Can select a move for itself.
  */
 public class MachinePlayer extends Player {
-  
-	protected int color;
+	//Constants
+	protected static int DEFAULTSEARCHDEPTH=5;
+	protected static int STEPSEARCHDEPTH=1;
+	protected static int HASHSIZE=1000;				//TODO: Determine appropriate search depth.
+	protected static String NAME="Alan Turing";
+	
+
+	//Instance Vars
 	protected int searchDepth;
+	protected int color;
 	protected Board board;
-	protected HashTable boards;
-	
-	// Creates a machine player with the given color.  Color is either 0 (black)
-	// or 1 (white).  (White has the first move.)
-	public MachinePlayer(int color){
-		this.color = color;
-		this.searchDepth = 5;
-		board = new Board();
-		myName = "God";
-		boards = new HashTable(1000); //Test number
-  	}
+	protected HashTable boardCache;
 
-	// Creates a machine player with the given color and search depth.  Color is
-	// either 0 (black) or 1 (white).  (White has the first move.)
+	// Creates a machine player with the given color.	Color is either 0 (black)
+	// or 1 (white).	(White has the first move.)
+	public MachinePlayer(int color) {
+	  this(color,DEFAULTSEARCHDEPTH);
+	}
+
+	// Creates a machine player with the given color and search depth.	Color is
+	// either 0 (black) or 1 (white).	(White has the first move.)
 	public MachinePlayer(int color, int searchDepth) {
-		this.color = color;
-		board = new Board();
-		myName = "God";
-		this.searchDepth = searchDepth;
-		boards = new HashTable(1000); //Test number
-	}
-	
-	/**
-	 *
-	 * Specifically used for testing code. Can use a board already created a 
-	 * play from there.
-	 *
-	**/
-	public MachinePlayer(int color, int searchDepth, Board board) {
-		this.color = color;
-		this.searchDepth = searchDepth;
-		this.board = board;
-		myName = "God";
-		boards = new HashTable(1000); //Test number
+		this.color=color;
+		this.searchDepth=searchDepth;
+		this.myName=NAME;
+		this.board=new Board();
+		this.boardCache = new HashTable(HASHSIZE);
 	}
 
-	/** Returns a new move by "this" player.  Internally records the move (updates
-         *  the internal game board) as a move by "this" player.
-         * @return The new Move. 
-        **/
+	// Returns a new move by "this" player.	Internally records the move (updates
+	// the internal game board) as a move by "this" player.
 	public Move chooseMove() {
-		Move dummy_move = new Move(); //Initializer
-		Board copy = new Board();
-		copy = board;
-		Move bestMove = chooseOptimalMove(color, Constants.START_ALPHA, 
-						Constants.START_BETA, dummy_move, searchDepth(1000), board);
-		board = copy; // Returns board to what it once was before going down game tree. 
-		updateBoard(color, bestMove);
-		return bestMove;
-	}
+		Move m = chooseBestMove(color,-2,2,searchDepth).move;
+		try{
+			board.doMove(m,color);
+		}catch(InvalidMoveException e){
+			Constants.print("This should never happen.");
+		}
+		Constants.print(board);
+		return m;
+	} 
 
 	// If the Move m is legal, records the move as a move by the opponent
-	// (updates the internal game board) and returns true.  If the move is
+	// (updates the internal game board) and returns true.	If the move is
 	// illegal, returns false without modifying the internal state of "this"
-	// player.  This method allows your opponents to inform you of their moves.
+	// player.	This method allows your opponents to inform you of their moves.
 	public boolean opponentMove(Move m) {
-		if (color == Constants.WHITE) {
-			return updateBoard(Constants.BLACK, m);
-		}
-		else {
-			return updateBoard(Constants.WHITE, m);
+		try{
+			board.doMove(m,getOppColor(this.color));
+			return true;
+		}catch (InvalidMoveException e){
+			return false;
 		}
 	}
 
-	/** If the Move m is legal, records the move as a move by "this" player
-         * (updates the internal game board) and returns true.  If the move is
-	 * illegal, returns false without modifying the internal state of "this"
-	 * player.  This method is used to help set up "Network problems" for your
-	 * player to solve.
-         * @param The move being tested
-         * @return Whether the move is legal or not.
-        **/
+	// If the Move m is legal, records the move as a move by "this" player
+	// (updates the internal game board) and returns true.	If the move is
+	// illegal, returns false without modifying the internal state of "this"
+	// player.	This method is used to help set up "Network problems" for your
+	// player to solve.
 	public boolean forceMove(Move m) {
-    	if (color == Constants.BLACK) {
-			return updateBoard(Constants.BLACK, m);
-		}
-		else {
-			return updateBoard(Constants.WHITE, m);
-		}
-	}
-	
-	/**
-	 *
-	 *	Calculates how far the MachinePlayer will search through the tree.
-	 *  @param the stack limit we want to set it.
-	 *  @return how far it will search through the tree for the instance of the board.
-	**/
-	private int searchDepth(int stackLimit) {
-		int numSpots = 0;
-		int currStacks = 1;
-		int searchDepth = 0;
-		for (int x = 0; x < Constants.BOARDWIDTH; x++) {
-			for (int y = 0; y < Constants.BOARDHEIGHT; y++) {
-				if (!board.hasChip(x,y)) {
-					numSpots++; 
-				}
-			}		
-		}
-		while (currStacks * numSpots < stackLimit) {
-			currStacks = currStacks * numSpots;
-			numSpots--;
-			searchDepth++;
-		}
-		return searchDepth;
-	}
-	
-	/**
-	 *
-	 * Returns the best possible move for the board.
-	 * @param color the side in which the move will be determined.
-	 * @param alpha maximum lower bound for game tree
-	 * @param beta minimum upper bound for game tree
-	 * @param bestMove the best Move that has been currently made. 
-	 * @param searchDepth how far down the game tree it will search.
-         * @return The optimal move.
-	**/
-	private Move chooseOptimalMove(int color, int alpha, int beta, 
-		Move bestMove, int searchDepth, Board board) {
-		// I had an extremely hard time with this. If you guys can fix it that would be great :D
-		
-		//Board copy = new Board(); //Saving board before anything is called.
-		//copy = board;
-		if (searchDepth == 0 || evalBoard(color,board) == Constants.START_BETA) {
-			return bestMove;
-		}
-		
-		else if (color == this.color) {
-			if (board.isFull()) {
-				//Step implementation	
-				for (int x1 = 0; x1 < Constants.BOARDWIDTH; x1++) {
-					for (int y1 = 0; y1 < Constants.BOARDHEIGHT; y1++) {
-						if (!board.hasChip(x1,y1) || board.getChip(x1,y1).getColor() != color) {
-							continue; //No chip, nothing to see here move on.
-						}
-						else {
-							for (int x2 = 0; x2 < Constants.BOARDWIDTH; x2++) {
-								for (int y2 = 0; y2 < Constants.BOARDHEIGHT; y2++) {
-									//board = copy; // reverts every sibling.
-									Move step = new Move(x2,y2,x1,y1);
-									updateBoard(color,step);									
-									if (!board.hasChip(x2,y2) && board.hasChip(x1,y1)) {
-										continue; //Invalid move, nothing to see here move along.
-									}
-								
-									int score = evalBoard(color, board);
-                                                                        revertBoard(color,step);
-									// Changing beta during opponent's turn's turn.  
-									if (score < beta) {
-										beta = score;
-									}
-									// Pruning
-									if (beta <= alpha) {
-										break;
-									}
-						
-									// Moving down the game tree
-									else if (color == Constants.BLACK) {
-										return chooseOptimalMove(Constants.WHITE, alpha, beta, bestMove, searchDepth-1, board);
-									}
-									else {
-										return chooseOptimalMove(Constants.BLACK, alpha, beta, bestMove, searchDepth-1, board);
-									}
-								}
-							}
-						}
-					}
-				}
-				return bestMove;
-			}
-						
-			else {
-				//Move implementation
-				
-				// Going through all possible child nodes.
-				for (int x = 0; x < Constants.BOARDWIDTH; x++) {
-					for (int y = 0; y < Constants.BOARDHEIGHT; y++) {
-						//board = copy; // reverts every sibling.
-						Move move = new Move(x,y);
-						updateBoard(color,move);
-						if (!board.hasChip(x,y)) {
-							continue; //Invalid chip, nothing to see here move on.
-						}
-						
-						int score = evalBoard(color, board);
-                                                revertBoard(color,move);
-						// Changing alpha during player's turn.  
-						if (score >= alpha) {
-							alpha = score;
-							bestMove = move;
-						}
-						// Pruning
-						if (beta <= alpha) {
-							break;
-						}
-						
-						// Moving down the game tree
-						else if (color == Constants.BLACK) {
-							return chooseOptimalMove(Constants.WHITE, alpha, beta, bestMove, searchDepth-1, board);
-						}
-						else {
-							return chooseOptimalMove(Constants.BLACK, alpha, beta, bestMove, searchDepth-1, board);
-						}
-					}
-				}
-			return bestMove;	
-			}
-		}
-		//Opponent's turn
-		else {
-			if (board.isFull()) {
-				//Step implementation	
-				for (int x1 = 0; x1 < Constants.BOARDWIDTH; x1++) {
-					for (int y1 = 0; y1 < Constants.BOARDHEIGHT; y1++) {
-						if (!board.hasChip(x1,y1) || board.getChip(x1,y1).getColor() != color) {
-							continue; //No chip, nothing to see here move on.
-						}
-						else {
-							for (int x2 = 0; x2 < Constants.BOARDWIDTH; x2++) {
-								for (int y2 = 0; y2 < Constants.BOARDHEIGHT; y2++) {
-									//board = copy; // reverts every sibling.
-									Move step = new Move(x2,y2,x1,y1);
-									updateBoard(color,step);									
-									if (!board.hasChip(x2,y2) && board.hasChip(x1,y1)) {
-                                                                                revertBoard(color,step);
-										continue; //Invalid move, nothing to see here move along.
-									}
-								
-									int score = evalBoard(color, board);
-                                                                        revertBoard(color,step);
-									// Changing beta during opponent's turn's turn.  
-									if (score < beta) {
-										beta = score;
-										bestMove = step;
-									}
-									// Pruning
-									if (beta <= alpha) {
-										break;
-									}
-						
-									// Moving down the game tree
-									else if (color == Constants.BLACK) {
-										return chooseOptimalMove(Constants.WHITE, alpha, beta, bestMove, searchDepth-1, board);
-									}
-									else {
-										return chooseOptimalMove(Constants.BLACK, alpha, beta, bestMove, searchDepth-1, board);
-									}
-								}
-							}
-						}
-					}
-				}
-				return bestMove;
-			}
-			else {
-				for (int x = 0; x < Constants.BOARDWIDTH; x++) {
-					for (int y = 0; y < Constants.BOARDHEIGHT; y++) {
-						//board = copy; // reverts every sibling.
-						Move move = new Move(x,y);
-						updateBoard(color,move);
-						if (!board.hasChip(x,y)) {
-                                                        revertBoard(color,move);
-							continue; //Invalid chip, nothing to see here move on.
-						}
-						
-						int score = evalBoard(color , board);
-                                                revertBoard(color,move);
-						// Changing beta during opponent's turn.  
-						if (score < beta) {
-							beta = score;
-							bestMove = move;
-						}
-						
-						// Pruning
-						if (beta <= alpha) {
-							break;
-						}
-						
-						// Moving down the game tree
-						else if (color == Constants.BLACK) {
-							return chooseOptimalMove(Constants.WHITE, alpha, beta, bestMove, searchDepth-1, board);
-						}
-						else {
-							return chooseOptimalMove(Constants.BLACK, alpha, beta, bestMove, searchDepth-1, board);
-						}
-					}
-				}
-				return bestMove;
-			}		
+		try{
+			board.doMove(m,this.color);
+			return true;
+		}catch (InvalidMoveException e){
+			return false;
 		}
 	}
-		
-	/**
-	 * An algorithm to evaluate the current situation of the board for a player.
-	 * @param color - the player whose perspective score will be evaluated.
-	 * @param board - the board in which the score will be evaluated for.
-	 * @return the score of the board.
-	**/
-	private int evalBoard(int color, Board board) {
-		// The current algorithm needs serious improvement.
-		DList<Net> networks = board.getLongestNetworks(); 
-		int score = 0;
-		while (!networks.isEmpty()) {
-			Net network = networks.popFront();
-			if (network.getLength() == Constants.WINNING_NETWORK) {
-				if(network.getPlayer() == color) {
-					return Constants.START_ALPHA;
-				}
-				else {
-					return Constants.START_BETA;
-				}
-			}
-			int netScore = network.getLength();
-			if (network.getPlayer() == color) {
-				score += netScore;
-			}
-			else {
-				score -= netScore;
-			}
-		}
-		return score; 
-	}
-	/**
-	 *
-	 * Updates the internal board for the player. If move is invalid, then it does not update.
-	 * @param color of the piece it wants to update the internal board with.
-	 * @param Move m, the move with which it wants to update the internal board.
-	 * @return True if move is valid, false otherwise. 
-	**/
-	private boolean updateBoard(int color, Move move) {
-            try{
-		board.doMove(move, color);
-                return true;
-            }
-            catch(InvalidMoveException e){
-                return false;
-            }
-	}
-        private boolean revertBoard(int color, Move move){
-            try{
-                board.doMove(move, color);
-                return true;
-            }
-            catch(InvalidMoveException e){
-                return false;
-            }
-        }
-}                            
 
+
+	//Helper functions
+	
+
+	private static int START_ALPHA=-2;
+	private static int START_BETA=2;
+
+	//Use Minimax to recursively finds the optimal move for the player
+	private Best chooseBestMove(int currColor, double alpha, double beta, int depth){
+		if (board.numBlack()==10 && board.numWhite()==10){
+			depth=Math.min(depth,STEPSEARCHDEPTH);
+		}
+
+
+		//Init my best move and opponent's best moves
+		Best myBest = new Best(new Move(), 0);
+		Best reply;
+
+		//Base Case: If the board already has a winning network or the recursive depth is hit, return the board's score
+		if (board.getWinner()!=Constants.NULL_PLAYER || depth==0){
+			myBest.score=scoreBoard(depth);
+			return myBest;
+		}
+
+		//Otherwise, commence alpha-beta pruning and game tree search
+		if (currColor==this.color){	//Curr Player is Machine
+			myBest.score=alpha;
+		}else{	//Curr Player is human
+			myBest.score=beta;
+		}
+
+		//Get all moves
+		DList<Move> moves = getAllMoves(currColor);
+	
+		Move m;
+		while (!moves.isEmpty()){//For each move
+			m=moves.pop();
+
+			//Do the move
+			try{
+				board.doMove(m,currColor);
+			}catch (InvalidMoveException e){
+				//Illegal move caught. Board is unchanged, so resume next.
+				continue;	
+			}
+
+			//Minimax recursive step
+			reply = chooseBestMove(getOppColor(currColor),alpha,beta,depth-1);
+
+			//Undo the move.
+			try{
+				board.undoMove(m,currColor);
+			}catch(InvalidMoveException e){
+				Constants.print("This should never happen.");
+				System.exit(1);
+			}
+
+			if ((currColor==this.color) && (reply.score >= myBest.score)){ //Curr Player is machine
+				myBest.move=m;
+				myBest.score=reply.score;
+				alpha=reply.score;
+			}else if(currColor==getOppColor(this.color)){ //Curr Player is human
+				myBest.move=m;
+				myBest.score=reply.score;
+				beta=reply.score;
+			}
+			if (alpha>=beta){
+				return myBest;
+			}
+		}
+		return myBest;
+	}
+
+	//Gets all moves for myColor
+	private DList<Move> getAllMoves(int myColor){
+		DList<Move> moves = new DList<Move>();
+		for (int x = 0; x < Constants.BOARDWIDTH; x++){
+			for (int y = 0; y < Constants.BOARDWIDTH; y++){
+
+				if (board.numWhite()==10 && board.numBlack()==10){	//Consider step moves only
+
+					if (board.hasChip(x,y) && board.getChip(x,y).getColor()==myColor){
+						for (int dx = -Constants.BOARDWIDTH; dx < Constants.BOARDWIDTH; dx++){
+							for (int dy = -Constants.BOARDHEIGHT; dy < Constants.BOARDHEIGHT; dy++){
+								moves.push(new Move(x+dx,y+dy,x,y));
+							}
+						}
+					}
+
+				}else{												//Consider add moves only
+					//If x,y is empty, can add a chip to x,y
+					if (!board.hasChip(x,y)){
+						moves.push(new Move(x,y));
+					}
+				}
+			}
+		}
+		return moves;
+	}
+
+	//Returns the score of the current board
+	//Scores go from -2 to 2. All scores above 1 are winning moves, and all scores below -1 are losing moves.
+	private double scoreBoard(int depth){
+		if (board.getWinner()==this.color){
+			return 1.0+(((double)depth)/searchDepth);
+		}else if (board.getWinner()==getOppColor(this.color)){
+			return -1.0-(((double)(searchDepth-depth))/searchDepth);
+		}else{
+			return 0;
+		}
+	}
+
+	//Returns opponent color
+	private int getOppColor(int c){
+		if (c==Constants.BLACK){
+			return Constants.WHITE;
+		}else if (c==Constants.WHITE){
+			return Constants.BLACK;
+		}else{
+			return Constants.NULL_PLAYER;
+		}
+	}
+
+}
+class Best{
+	protected Move move;
+	protected double score;
+	public Best(Move m, double s){
+		this.move=m;
+		this.score=s;
+	}
+}

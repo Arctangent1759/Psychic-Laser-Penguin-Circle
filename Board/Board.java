@@ -73,7 +73,7 @@ public class Board{
 				addChip(color,m.x1,m.y1);
 				break;
 			case Move.STEP:
-				moveChip(m.x1,m.y1,m.x2,m.y2,color);
+				moveChip(m.x2,m.y2,m.x1,m.y1,color);
 				break;
 			case Move.QUIT:
 				break;
@@ -101,7 +101,7 @@ public class Board{
 				removeChip(m.x1,m.y1);
 				break;
 			case Move.STEP:
-				moveChip(m.x2,m.y2,m.x1,m.y1,color);
+				moveChip(m.x1,m.y1,m.x2,m.y2,color);
 				break;
 			case Move.QUIT:
 				break;
@@ -135,9 +135,9 @@ public class Board{
 			throw new InvalidMoveException("Tried to move chip of the wrong color.");
 		}
 
-		//Verify that the chip is only being moved 1 step orthogonally or diagonally
-		if (Math.abs(x1-x2)>1 || Math.abs(y1-y2)>1 || (Math.abs(x1-x2)==0 && Math.abs(y1-y2)==0)){
-			throw new InvalidMoveException("Invalid move from (" + x1 + "," + y1 + ") to (" + x2 + "," + y2 + ").");
+		//Make sure you do not move from x1,y1 to x1,y1
+		if (x1==x2 && y1==y2){
+			throw new InvalidMoveException("Tried to move chip to its own position.");
 		}
 
 		//Get the chip at (x1,y1)'s color
@@ -193,6 +193,16 @@ public class Board{
 			numBlack++;
 		}
 
+		//Make sure x,y is on the board
+		if (x < 0 || x >= Constants.BOARDWIDTH || y < 0 || y >= Constants.BOARDWIDTH){
+			if (color == Constants.WHITE) {
+				numWhite--;
+			}else if (color == Constants.BLACK) {
+				numBlack--;
+			}
+			throw new InvalidMoveException("Attempted to place chip off board. Coordinates " + x + "," + y);
+		}
+
 		//Enforce the chip limit
 		if (color == Constants.WHITE && numWhite>10) {
 			numWhite--;
@@ -229,6 +239,11 @@ public class Board{
 	}
 
 	public void removeChip(int x, int y){
+		if (getChip(x,y).color==Constants.BLACK){
+			numBlack--;
+		}else if(getChip(x,y).color==Constants.WHITE){
+			numWhite--;
+		}
 		grid[x][y]=null;
 	}
 
@@ -243,6 +258,20 @@ public class Board{
 	**/
 	public Chip getChip(int x, int y){
 		return grid[x][y];
+	}
+
+	/**
+	 * Returns the the number of black chips on the board
+	**/
+	public int numBlack(){
+		return numBlack;
+	}
+
+	/**
+	 * Returns the the number of white chips on the board
+	**/
+	public int numWhite(){
+		return numWhite;
 	}
 
 
@@ -686,7 +715,7 @@ public class Board{
 			b.addChip(0,1,4);
 			b.addChip(0,2,4);
 			Constants.print(b);
-			b.moveChip(3,5,3,4,0);
+			b.moveChip(3,5,5,6,Constants.WHITE);
 		}catch(InvalidMoveException e){
 			Constants.print(e);
 			Constants.print(b);
