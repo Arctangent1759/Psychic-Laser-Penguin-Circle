@@ -103,13 +103,13 @@ public class MachinePlayer extends Player {
 
 		//Otherwise, commence alpha-beta pruning and game tree search
 		if (currColor==this.color){	//Curr Player is Machine
-			if (myBest.score > alpha) {
+			//if (myBest.score > alpha) {							//TODO:JONG WHAT THE FUCK WERE YOU THINKING
 				myBest.score = alpha;
-			}
+			//}
 		}else{	//Curr Player is human
-			if (myBest.score < beta) {
+			//if (myBest.score < beta) {
 				myBest.score = beta;
-			}
+			//}
 		}
 
 		//Get all moves
@@ -138,11 +138,11 @@ public class MachinePlayer extends Player {
 				System.exit(1);
 			}
 
-			if ((currColor==this.color) && (reply.score >= myBest.score)){ //Curr Player is machine
+			if ((currColor==this.color) && (reply.score > myBest.score)){ //Curr Player is machine
 				myBest.move= m;
 				myBest.score=reply.score;
 				alpha = reply.score;
-			}else if(currColor==getOppColor(this.color)){ //Curr Player is human
+			}else if((currColor==getOppColor(this.color)) && (reply.score < myBest.score)){ //Curr Player is human
 				myBest.move=m;
 				myBest.score=reply.score;
 				beta = reply.score;
