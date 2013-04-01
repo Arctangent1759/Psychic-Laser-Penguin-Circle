@@ -224,7 +224,10 @@ public class MachinePlayer extends Player {
 			}
 			else if (board.getWinner() == color) {
 				//boardCache.add(board.hashCode(), (double)Constants.START_BETA);
-				return ((double)Constants.START_BETA);
+				if (depth == 0) {
+					return ((double)Constants.START_BETA) - 0.08;
+				}
+				return ((double)Constants.START_BETA) - depth/10 + depth / 9 - 0.08;
 			}
 			else {
 				if (network.getPlayer() == color) {
