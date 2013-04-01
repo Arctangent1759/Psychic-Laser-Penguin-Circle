@@ -690,6 +690,12 @@ public class Board{
 
 
 	public static void main(String[] args){
+		testNetworkGetterInteractive();
+	}
+
+	//Test packages
+	
+	private static void testMove(){
 		Board c = new Board();
 		Board b = new Board(c);
 		try{
@@ -721,10 +727,8 @@ public class Board{
 			System.exit(1);
 		}
 		Constants.print(b);
-	}
 
-	//Test packages
-	
+	}
 	private static void testNetworkGetterInteractive(){
 		BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
 		int input=0;

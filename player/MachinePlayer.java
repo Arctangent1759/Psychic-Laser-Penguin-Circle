@@ -12,7 +12,7 @@ import Constants.Constants;
  */
 public class MachinePlayer extends Player {
 	//Constants
-	protected static int DEFAULTSEARCHDEPTH=5;
+	protected static int DEFAULTSEARCHDEPTH=4;
 	protected static int STEPSEARCHDEPTH=1;
 	protected static int HASHSIZE=1000;				//TODO: Determine appropriate search depth.
 	protected static String NAME="Alan Turing";
@@ -149,6 +149,30 @@ public class MachinePlayer extends Player {
 			}
 			if (alpha>=beta){
 				return myBest;
+			}
+		}
+		if (myBest.move.moveKind==Move.QUIT){
+			moves = getAllMoves(currColor);
+			while (!moves.isEmpty()){//For each move
+				m=moves.pop();
+				//Do the move
+				try{
+					board.doMove(m,currColor);
+				}catch (InvalidMoveException e){
+					//Illegal move caught. Board is unchanged, so resume next.
+					continue;	
+				}
+
+				myBest.move=m;
+
+				//Undo the move.
+				try{
+					board.undoMove(m,currColor);
+				}catch(InvalidMoveException e){
+					Constants.print("This should never happen.");
+					System.exit(1);
+				}
+				break;
 			}
 		}
 		return myBest;
