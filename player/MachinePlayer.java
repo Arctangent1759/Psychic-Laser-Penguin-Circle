@@ -227,7 +227,7 @@ public class MachinePlayer extends Player {
 				if (depth == 0) {
 					return ((double)Constants.START_BETA) - 0.08;
 				}
-				return ((double)Constants.START_BETA) - depth/10 + depth / 9 - 0.08;
+				return ((double)Constants.START_BETA) - depth/10.0 + depth / 9.0 - 0.08;
 			}
 			else {
 				if (network.getPlayer() == color) {
