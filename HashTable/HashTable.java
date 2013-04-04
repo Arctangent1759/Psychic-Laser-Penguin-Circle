@@ -3,7 +3,7 @@ import DList.*;
 
 /***
 *An Enhanced version of hashTable utilizing DList.
-*
+*   
 *
 *
 *
@@ -16,8 +16,8 @@ public class HashTable{
         public static int numO  = 0;
 	protected DList<Object>[] chains;
 	/**
-	*  Constructor of the bucket.
-*   @param numBuckets represents expected size of hashTable. 
+	 *       Constructor of the bucket.
+         *       @param numBuckets represents expected size of hashTable. 
 	**/ 
 	@SuppressWarnings("unchecked")
 	public HashTable(int sizeExpected){
@@ -44,7 +44,7 @@ public class HashTable{
 		}
 	}
 	/**
-	 *  Compresses the hash so it fits inside the bucket.
+	 *      Compresses the hash so it fits inside the bucket.
 	 *	@param hash is the hash being compressed.
 	 *	@return the compressed hash.
 	**/
@@ -59,8 +59,8 @@ public class HashTable{
 
 	/**
 	 *	Adds an entry to the HashTable.
-	 *	@param 
-	 *
+	 *	@param object h, value.
+	 *      @return nothing.
 	 *
 	**/
 	public void add(Object h, Object value){
@@ -71,6 +71,12 @@ public class HashTable{
 		chains[hash].pushFront(keyValuePair);
 	}
         
+        /**
+	 *	Gets an entry to the HashTable.
+	 *	@param object h, value.
+	 *      @return nothing.
+	 *
+	**/
 	public Entry get(Object key){
 		int hash = compress(key.hashCode());
 		DListNode node = chains[hash].getFront();
@@ -83,7 +89,10 @@ public class HashTable{
 		}
 		return null;
 	} 
-        
+        /**
+	 *      Testing function creating representation of board.
+	 *      @return a random board.
+	**/
          public static String randomBoard(){
             String a = "";
             for(int length = 0; length<8;length++){
@@ -108,6 +117,11 @@ public class HashTable{
             }
            return a;
         }
+        /**
+         * Another testing function.
+         * Prints the number of collisions.
+         * 
+         */
         public void countCollisions(){
             int collisions = 0;
             for(int index = 0; index<chains.length;index++){

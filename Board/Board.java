@@ -31,7 +31,7 @@ public class Board{
 	protected int numBlack;
 
 	/**
-	 *
+	 *      
 	 *	Constructs a new Board.
 	 *
 	**/
@@ -238,6 +238,15 @@ public class Board{
 		}
 	}
 
+        /**
+	 *
+	 *	Removes chip at x,y.
+
+	 *	@param x the x coordinate
+	 *	@param y the y coordinate
+         *      @return the chip.
+	 *
+	**/
 	public void removeChip(int x, int y){
 		if (getChip(x,y).color==Constants.BLACK){
 			numBlack--;
@@ -261,14 +270,14 @@ public class Board{
 	}
 
 	/**
-	 * Returns the the number of black chips on the board
+	 * @return the the number of black chips on the board
 	**/
 	public int numBlack(){
 		return numBlack;
 	}
 
 	/**
-	 * Returns the the number of white chips on the board
+	 * @return the the number of white chips on the board
 	**/
 	public int numWhite(){
 		return numWhite;
@@ -303,6 +312,7 @@ public class Board{
         /**
          *      Returns whether the board is full or not. This is when 10 white chips
          *      and 10 black chips are on the field.
+         *      @return whether the board is full or not.
          * 
          **/
         public boolean isFull(){
@@ -344,7 +354,6 @@ public class Board{
 	 * @return boolean that states if the chip location is valid.
 	 *
 	**/
-
 	public boolean isValid(){
 		//Enforce chip placement rule 1. Cannot place in corners.
 		if (hasChip(0,0) || hasChip(Constants.BOARDWIDTH-1,0) || hasChip(0,Constants.BOARDHEIGHT-1) || hasChip(Constants.BOARDWIDTH-1,Constants.BOARDHEIGHT-1)){
@@ -382,6 +391,8 @@ public class Board{
 	/**
 	 *
 	 *	Returns the number of same-color neighbors this chip has.
+         *      @param x refers to the x-coordinate.
+         *      @param y refers to the y coordinate.
 	 *	@returns the number of neighbors of this chip's color.
 	 *
 	**/
@@ -470,7 +481,10 @@ public class Board{
 		}
 		return out;
 	}
-
+        /**
+         * 
+         * @return the key of the object.
+        **/
 	public String getKey(){
 		return this.toString();
 	}

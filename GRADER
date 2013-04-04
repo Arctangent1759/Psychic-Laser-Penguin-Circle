@@ -42,6 +42,552 @@ Does your MachinePlayer use any special method of choosing the first few moves?
 Is there anything else the graders should know to help them read your project?
 
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*********           Commandments:             ********
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	Anyone found in violation of the folowing statutes will be summarily executed.
+
+	General
+	-------
+		1. Don't be a dick.
+
+	Formatting and Readability
+	--------------------------
+		1. Single tabs, not spaces
+		2. Don't use i, j, k
+		3. Use Camel case
+		4. When in doubt, comment.
+		5. Multiline comment docstrings
+		6. Specify orders of growth for all your functions.
+	
+	Coding Style
+	------------
+		1. Always use override decorator
+		2. When in doubt, use protected
+		3. Use constants when available, not values.
+		4. Abstraction!
+
+	Github and Collaboration
+	------------------------
+		1. Do not push untested or disfunctional code to github.
+		2. Push and test often if editing shared file like Constants
+	
+	Debugging
+	---------
+		1. Use Constants.print, not System.out.println
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+*********          Interface Design           ********
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Constants
+=========
+	/**
+	 *
+	 *	Global class contining constants that will be
+	 *	used throughout the project.
+	 *
+	**/
+	public final class Constants{
+
+
+		//Board Constants
+		public static final BOARDHEIGHT=8; //The height of a board
+		public static final BOARDWIDTH=8; //The width of a board
+
+
+		//Player Constants
+		public static final NULL_PLAYER=0; //No player here
+		public static final BLACK=1; //Black player
+		public static final WHITE=2; //White player
+
+
+		//Game Constants
+		public static final MAX_CHIPS=10; //The maximum number of chips in the game
+
+
+		//Debugging and misc.
+		public static final DEBUG=true; //Used to disable unwanted debug output
+
+		/**
+		 *
+		 *	Prints o to stdout, if DEBUG is true.
+		 *	@param o The object to be printed
+		 *
+		**/
+		public static final void print(Object o);
+
+	}
+HashTable Module
+============
+	/**
+	 *	
+	 *	HashTable stores the boards, allowing for quicker access and 
+         *      improving the speed of the problem. It uses the DList module.
+	 *	
+	 *	Invariants:
+	 *  	1. A key should only have one value.
+         *      
+	 *	
+	**/
+
+	/**
+	 *       Constructor of the bucket.
+         *       @param numBuckets represents expected size of hashTable. 
+	**/ 
+	public HashTable(int sizeExpected);
+
+	/**
+	 *      Compresses the hash so it fits inside the bucket.
+	 *	@param hash is the hash being compressed.
+	 *	@return the compressed hash.
+	**/
+	public int compress(int hash);
+
+	/**
+	 *	Adds an entry to the HashTable.
+	 *	@param object h, value.
+	 *      @return nothing.
+	 *
+	**/
+	public void add(Object h, Object value);
+
+        /**
+	 *	Gets an entry to the HashTable.
+	 *	@param object h, value.
+	 *      @return nothing.
+	 *
+	**/
+	public Entry get(Object key);
+
+        /**
+	 *      Testing function creating representation of board.
+	 *      @return a random board.
+	**/
+         public static String randomBoard();
+        
+        /**
+         *      Another testing function.
+         *      Prints the number of collisions.
+         */
+        public void countCollisions()
+
+
+Board Module
+============
+	/**
+	 *	
+	 *	Board represents a single game state. It knows the 
+	 *	position of each chip, and enforces the rules of the 
+	 *	game, throwing an exception whenever a rule violation
+	 *	is encountered.
+	 *	
+	 *	Invariants:
+	 *  	1. Will throw an exception if a move is illegal.
+	 *  	2. No two chips in any given place.
+	 *  	3. Cannot be three chips adjacent to each other.
+	 *  	4. Cannot place more than 10 chips of the same color.
+	 *  	5. No chips in wrong goals.
+	 *  	6. No chips in corners.
+	 *	
+	**/
+	public class Board{
+		
+		/**
+		 *
+		 *	Constructs a new Board.
+		 *
+		**/
+		public Board();
+
+                /**
+                 *
+                 *	Incorporates a move into the internal game board.
+                 *	@param m is the move that the board is incorporating.
+                 *	@param color is the color of the player performing the move.
+                 *	@throws InvalidMoveException when a move makes a board invalid.
+                 *
+                **/
+                public void doMove(Move m, int color) throws InvalidMoveException;
+
+                /**
+                 *
+                 *	Undo a move in the internal game board. 
+                 *
+                 *	NEVER CALL BEFORE CALLING Board.doMove() WITH THE MOVE FIRST! 
+                 *	Board.doMove() MUST NOT THROW AN EXCEPTION. FAILURE TO ADHERE 
+                 *	TO THIS WILL CAUSE VIOLATION OF INVARIANTS.
+                 *
+                 *	@param m is the move that the board is incorporating.
+                 *	@param color is the color of the player performing the move.
+                 *	@throws InvalidMoveException when a move makes a board invalid.
+                 *
+                **/
+                public void undoMove(Move m, int color) throws InvalidMoveException;
+
+                /**
+                 *
+                 *	Moves chip c to point x,y
+                 *	@param x1,x2 the coordinates of the chip to be moved.
+                 *	@param x1,x2 the coordinates of the chip's destination.
+                 *	@param color the color of the player placing the chip
+                 *	@throws InvalidMoveException when a move makes a board invalid.
+                 *
+                **/
+                public void moveChip(int x1, int y1, int x2, int y2, int color) throws InvalidMoveException{
+
+                /**
+                 *
+                 *	Creates chip at x,y.
+                 *	@param color the color of the chip to be
+                 *		   created
+                 *	@param x the destination x coordinate
+                 *	@param x the destination x coordinate
+                 *	@param y the destination y coorinate
+                 *
+                **/
+                public void addChip(int color, int x, int y) throws InvalidMoveException{
+
+		/**
+		 *
+		 *	Gets the chip at x,y.
+		 *	@param x the target x coordinate
+		 *	@param y the target y coordinate
+		 *	@throws ChipNotFoundException if there is no chip at x,y
+		 *	@return the Chip at x,y
+		 *
+		**/
+		public Chip getChip(int x, int y) throws ChipNotFoundException;
+
+                /**
+                 *
+                 *	Removes chip at x,y.
+
+                 *	@param x the x coordinate
+                 *	@param y the y coordinate
+                 *      @return the chip.
+                 *
+                **/
+                public void removeChip(int x, int y);
+
+		/**
+		 *
+		 *	Tells whether a chip at x,y exists
+		 *	@param x the target x coordinate
+		 *	@param y the target y coordinate
+		 *	@return whether there is a chip at x,y
+		 *
+		**/
+		public boolean hasChip(int x, int y);
+
+                /**
+                *       @return the the number of black chips on the board
+                **/
+                public int numBlack();
+
+                /**
+                 * @return the the number of white chips on the board
+                **/
+                public int numWhite();
+
+                /**
+                 *
+                 *	Tells whether a chip at x,y exists
+                 *	@param x the target x coordinate
+                 *	@param y the target y coordinate
+                 *	@return whether there is a chip at x,y
+                 *
+                **/
+                public boolean hasChip(int x, int y);
+
+                /**
+                 *
+                 *	Returns whether this Chip a is line of sight with Chip b
+                 *	@param x1,y1 are the coordinates of the chip of reference.
+                 *	@param x2,y2 are the coordinates of the chip for comparison
+                 *	@return whether the chip is line of sight with b
+                 *
+                **/
+                public boolean isLOS(int x1,int x2,int y1,int y2);
+
+	
+                /**
+                 *      Returns whether the board is full or not. This is when 10 white chips
+                 *      and 10 black chips are on the field.
+                 *      @return whether the board is full or not.
+                 * 
+                 **/
+                public boolean isFull();
+
+                /**
+                 *
+                 *	Returns whether chip 1 interrupts the path between chips 2 and 3.
+                 *	@param x1, y1 the reference chip
+                 *	@param x2, y2 the second chip
+                 *	@param x3, y3 the third chip
+                 *	@return whether this chip is between 2 and 3.
+                 *
+                **/
+                public boolean isInterruptPath(int x1, int y1, int x2, int y2, int x3, int y3);
+
+                /**
+                 *
+                 * Checks for valid chip location.
+                 * 4 rules:
+                 * 1. Cannot place chips in corners.
+                 * 2. Cannot place in wrong goal.
+                 * 3. Cannot place three in contact with each other.
+                 * @return boolean that states if the chip location is valid.
+                 *
+                **/
+                public boolean isValid();
+
+                /**
+                 *
+                 *	Returns the number of same-color neighbors this chip has.
+                 *      @param x refers to the x-coordinate.
+                 *      @param y refers to the y coordinate.
+                 *	@returns the number of neighbors of this chip's color.
+                 *
+                **/
+                private int getSameColorNeighbors(int x, int y);
+
+                /**
+                 *
+                 * Returns whether the game is over.
+                 * @return the color of the winning player, or Constants.NULL_PLAYER if the game is not over.
+                 *
+                **/
+                public int getWinner();
+
+                /**
+                  *
+                  * Returns a string representation of the board. 
+                  * . is empty, X is BLACK, O is WHITE.
+                  * @return a string.
+                  *
+                 **/
+                 public String toString();
+
+                /**
+                 * 
+                 * @return the key of the object.
+                **/
+                public String getKey();
+
+                /**
+                 *
+                 * Returns a list of the longest networks.
+                 * @return a DList of networks
+                 *
+                **/
+                public DList<Net> getLongestNetworks()'
+
+             
+                /**
+                 *
+                 * Finds the longest network.
+                 * @param x is x value of the chip.
+                 * @param y is the y value of the chip.
+                 * @param last_direction is the last_direction the chip went in.
+                 * @param depth is referring to how far the object goes down.
+                 * @param origin_x is referring to the x-coordinate the original goal was in.
+                 * @param origin_y is referring to the y-coordinate the original goal was in.
+                 * @return a DList of networks
+                 *
+                **/
+                private DList<Net> expandLongestNetFromChip(int x, int y, int last_direction, int depth, int origin_x, int origin_y);
+
+                /**
+                 *
+                 * Returns a hashcode based on base3.
+                 * @return a DList of networks
+                 *
+                **/
+
+                public int hashCode();
+
+		/**
+		 *
+		 * Returns whether the game is over.
+		 * @return the color of the winning player, or Constants.NULL_PLAYER if the game is not over.
+		 *
+		**/
+		public int isGameOver();
+	}
+
+	/**
+	 *
+	 *	The chip ADT represents a single chip on the board.
+	 *	Each chip knows its position on the board.
+	 *
+	**/
+	public class Chip{
+
+		/**
+		 *
+		 *	Constructs a new chip on board b.
+		 *	@param b specifies the board that the chip belongs to
+		 *	@throws InvalidChipException when 
+		 *
+		**/
+		public Chip(Board b, color c, int x, int y) throws InvalidChipException;
+
+		/**
+		 *
+		 *	Get the color of the chip
+		 *	@return the color of the chip, defined in Constants
+		 *
+		**/
+
+		public int getColor();
+
+	}
+
+	/**
+	 *
+	 *	An exception thrown when a player attempts to create a chip at an invalid location
+	 *
+	**/
+	public class InvalidChipException extends Exception{
+
+		/**
+		 *
+		 *	Constructs an InvalidChipException
+		 *	@param s the message of the exception
+		 *	@param x the x coordinate of the invalid chip
+		 *	@param y the y coordinate of the invalid chip
+		 *
+		**/
+		public InvalidChipException(String s, int x, int y);
+	}
+
+	/**
+	 *
+	 *	An exception thrown when a player attemps to get a chip not on the board
+	 *
+	**/
+	public class ChipNotFoundException extends Exception{
+
+		/**
+		 *
+		 *	Constructs a ChipNotFoundException
+		 *	@param s the message of the exception
+		 *	@param x the x coordinate of the invalid chip query
+		 *	@param y the y coordinate of the invalid chip query
+		 *
+		**/
+		public ChipNotFoundException(String s, int x, int y);
+	}
+
+	/**
+	 *
+	 *	An exception thrown when a player attemps to move a chip to an illegal square.
+	 *
+	**/
+	public class IllegalChipMoveException extends Exception{
+
+		/**
+		 *
+		 *	Constructs a IllegalChipMoveException
+		 *	@param s the message of the exception
+		 *	@param x the x coordinate of the invalid chip move
+		 *	@param y the y coordinate of the invalid chip move
+		 *
+		**/
+		public IllegalChipMoveException(String s, int x, int y);
+	}
+
+AI Module
+=========
+	/**
+	 *
+	 *	MachinePlayer represents an instance of our AI.
+	 *
+	 *	Invariants:
+	 *  	1. Does not make illegal moves
+	 *  
+	**/
+	public class MachinePlayer extends Player{
+
+		/**
+		 *
+		 * Constructs a MachinePlayer with an AI for the game.
+		 * @param b The board in which this MachinePlayer belongs to.
+		 * @param c The color of which this MachinePlayer is.
+		**/
+		public MachinePlayer(Board b, Color c);
+
+		/**
+		 *
+		 * Decides what move is the best possible move.
+		 * Uses alpha-beta pruning with an algorithm determining how far 
+		 * the AI will search.
+		 * @return The best possible move based on the AI.
+		**/
+		@Override
+		public Move chooseMove();
+
+		/**
+		 *
+		 * Updates the current status of the internal board if the opponent move is legal.
+		 * If move is illegal, nothing is done to the internal status of the board.
+		 * Enforces invariant that the move was the opponent is not illegal when calculating "this" move.
+		 * @return boolean indicating whether opponent Move m is legal or not.
+		**/
+		@Override
+		public boolean opponentMove(Move m);
+
+		/**
+		 *
+		 * Updates the current status of the internal board if the "this" player move is legal.
+		 * If move is illegal, nothing is done to the internal status of the board.
+		 * Enforces the invariant that move made is not illegal.
+		 * @return boolean indicating whether opponent Move m is legal or not.
+		**/
+		@Override
+		public boolean forceMove(Move m);
+                
+                /**
+                 * Chooses the best move.
+                 * @param currColor color of player.
+                 * @param alpha When greater than beta, stop looking.
+                 * @param beta The variable being compared with.
+                 * @param depth The depth the project is searching through.
+                 * @return if move valid or not.
+                **/
+                private Best chooseBestMove(int currColor, double alpha, double beta, int depth);
+                
+                /**
+                 * Finds all of the moves or one color.
+                 * @param myColor color of current player in beta.
+                 * @return A list of moves.
+                **/
+                private DList<Move> getAllMoves(int myColor);
+
+                /**
+                 * Scores the board.
+                 * @param depth it's checking for.
+                 * @return the score of the move.
+                **/
+                private double scoreBoard(int depth);
+
+                /**
+                 * Gets the color of the opponent.
+                 * @param the color of the object now.
+                 * @return the color of opponent.
+                **/
+                private int getOppColor(int c);
+                
+               /**
+                * Object that stores the best move.
+               **/
+                class Best;
+
+	}
+
 
 Describe the classes, modules, and interfaces you designed before and while you
 implemented the project.  Your description should include:
