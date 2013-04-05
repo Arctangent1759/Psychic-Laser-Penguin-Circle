@@ -19,36 +19,106 @@ code together, you may not change partners without the permission of the
 instructor.
 ===============================================================================
 Does your program compile without errors?
-Yes.
+	Yes.
 
 Have you tested your program on the machines in the Soda CS 61B lab?
-No.
+	Yes.
 
 Did you successfully implement game tree search?  Did you successfully
 implement alpha-beta pruning?  Are there any limitations on it?  What is the
 default number of search levels set by the one-parameter MachinePlayer
 constructor?
-Game Tree Search: Yes.
-Alpha-Beta Pruning: Yes.
-Limitations: Takes nontrivial amounts of time to run (a few seconds per turn).
-Default search levels: 5
+	Game Tree Search: Yes.
+	Alpha-Beta Pruning: Yes.
+	Limitations: Takes nontrivial amounts of time to run (1-4 seconds per turn for search depth of 4).
+	Default search levels: 4
 
 Describe your board evaluation function in some detail.
+	First, we check if there is a winner. If the winner is our MachinePlayer, return
+	a score of 1.0+k, where k is a numer between 0 and 1 scaled based on the depth of
+	the recursive call for which the board is scored. If the winner is the opponent, return
+	-1 - k. This ensures that winning boards that allow the MachinePlayer to win in fewer 
+	turns score higher than winning boards that allow the MachinePlayer to win in more turns. 
+	Losing in more turns will score higher than losing in fewer turns.
+	If there is no winner, our getNetworks function gets the list of all networks that
+	are on board that are attached to a goal. We square the length of each network, thereby
+	rewarding longer networks for our MachinePlayer and punishing longer networks for
+	the opponent. Then, we take the ratio of the sum of the squared lengths of our MachinePlayer's
+	networks to the sum of the squared lengths of the opponent's networks, and return this quantity.
 
 
 Does your MachinePlayer use any special method of choosing the first few moves?
+	No. Just game tree search.
 
 
 Is there anything else the graders should know to help them read your project?
+	A note about credit:
+	We reviewed each others' code, and made significant changes to modules other than our 
+	own. Robert also originally implemented a hashtable with generics that uses our DList 
+	implementation. This hashtable was originally intended as something that would enhance 
+	our scoring function by allowing us to memoize scores for boards. This table compiled 
+	on our personal machines, but failed to compile on the instructional servers, and was 
+	cut entirely out of our implementation.
 
 
+Describe the classes, modules, and interfaces you designed before and while you
+implemented the project.  Your description should include:
+  -  A list of the classes your program uses.
+  -  A list of each of the "modules" used in or by MachinePlayer, similar to
+     the list in the "Teamwork" section of the README (but hopefully more
+     detailed).
+  -  For each module, list the class(es) the module is implemented in.
+  -  For each module, say which of your team members implemented it.
+  -  For each module, describe its interface--specifically, the prototype and
+     behavior of each method that is available for external callers (outside
+     the module) to call.  Don't include methods that are only meant to be
+     called from within the module.
+
+     For each method, provide (1) a method prototype and (2) a complete,
+     unambiguous description of the behavior of the method/module.  This
+     description should also appear before the method in your code's comments.
+
+You will probably need to change some of your design decisions as you go; be
+sure to modify this file to reflect these changes before you submit your
+project.  Your design of classes and interfaces with be worth about 10% of your
+grade.
 
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-*********           List of Functions:             ********
-++++++++++++++++++++++++++++++++++++++++++++++++++++++
-Constants
-=========
+*********           Interface:             **********
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Modules:
+	Module	|Credit
+	--------|---------------------
+	General	|Mantained by Everyone
+	DList	|Robert Chang
+	Board	|Alex Chu
+	AI		|Jong Ahn
+
+	A note about credit:
+	We reviewed each others' code, and made significant changes to modules other than our 
+	own. Robert also originally implemented a hashtable with generics that uses our DList 
+	implementation. This hashtable was originally intended as something that would enhance 
+	our scoring function by allowing us to memoize scores for boards. This table compiled 
+	on our personal machines, but failed to compile on the instructional servers, and was 
+	cut entirely out of our implementation.
+
+Classes:
+	Constants/Constants.class
+	player/Move.class
+	player/MachinePlayer.class
+	player/Best.class
+	player/Player.class
+	DList/DListNode.class
+	DList/DList.class
+	Board/InvalidMoveException.class
+	Board/Net.class
+	Board/Chip.class
+	Board/Board.class
+
+General Module
+==============
 	/**
 	 *
 	 *	Global class contining constants that will be
@@ -57,29 +127,28 @@ Constants
 	**/
 	public final class Constants{
 
-
-            //Board Constants
-            public static final int BOARDHEIGHT=8; //The height of a board
-            public static final int BOARDWIDTH = 8; //The width of a board
-            public static final int WINNING_NETWORK = 6; //Winning network length
-
-
-            //Player Constants
-            public static final int NULL_PLAYER=-1; //Black player
-            public static final int BLACK=0; //Black player
-            public static final int WHITE=1; //White player
+		//Board Constants
+		public static final int BOARDHEIGHT=8; //The height of a board
+		public static final int BOARDWIDTH = 8; //The width of a board
+		public static final int WINNING_NETWORK = 6; //Winning network length
 
 
-            //Game Constants
-            public static final int MAX_CHIPS=10; //The maximum number of chips in the game
-
-            // Machine Player Constants
-            public static final int START_ALPHA = -2; //Minimum alpha value
-            public static final int START_BETA = 2; //Maximum beta value
+		//Player Constants
+		public static final int NULL_PLAYER=-1; //Black player
+		public static final int BLACK=0; //Black player
+		public static final int WHITE=1; //White player
 
 
-            //Debugging and misc.
-            public static final boolean DEBUG=false; //Used to disable unwanted debug output
+		//Game Constants
+		public static final int MAX_CHIPS=10; //The maximum number of chips in the game
+
+		// Machine Player Constants
+		public static final int START_ALPHA = -2; //Minimum alpha value
+		public static final int START_BETA = 2; //Maximum beta value
+
+
+		//Debugging and misc.
+		public static final boolean DEBUG=false; //Used to disable unwanted debug output
 
 		/**
 		 *
@@ -89,107 +158,108 @@ Constants
 		**/
 		public static final void print(Object o);
 
-                /**
-                 *
-                 *  Tests string value of o against the string value of expected
-                 *  and stops the program on fail with an error message.
-                 *  Used exclusively for debugging purposes.
-                 *  @param expected The expected value
-                 *  @param o The object to be tested
-                 *
-                **/
-                public static final void printTest(Object expected, Object o);
+		/**
+		 *
+		 *  Tests string value of o against the string value of expected
+		 *  and stops the program on fail with an error message.
+		 *  Used exclusively for debugging purposes.
+		 *  @param expected The expected value
+		 *  @param o The object to be tested
+		 *
+		**/
+		public static final void printTest(Object expected, Object o);
+	}
 
 DList Module
 ===========
-public class DList<T>{
-        /**
-        * An enhanced version of the homework version of DListNode, with generics.
-        **/
+	public class DList<T>{
+		/**
+		* An enhanced version of the homework version of DListNode, with generics.
+		**/
 
-        //DList Constructor
-	public DList();
+		//DList Constructor
+		public DList();
 
-        /**
-         *  Figures out if the function is a boolean or not.
-         *  @return a boolean stating if Dlist is empty or not.
-        **/
-	public boolean isEmpty();
+		/**
+		 *  Figures out if the function is a boolean or not.
+		 *  @return a boolean stating if Dlist is empty or not.
+		**/
+		public boolean isEmpty();
 
 
-        /**
-         *  Pushes the object to th front.
-         *  @param T is item being pushed to the front.
-        **/
-	public void pushFront(T item);
+		/**
+		 *  Pushes the object to th front.
+		 *  @param T is item being pushed to the front.
+		**/
+		public void pushFront(T item);
 
-        /**
-         *  Pushes the object to the back.
-         *  @param T is item being pushed to the back.
-        **/
-	public void pushBack(T item);
+		/**
+		 *  Pushes the object to the back.
+		 *  @param T is item being pushed to the back.
+		**/
+		public void pushBack(T item);
 
-        /**
-         *  Pops the object from the front.
-         *  @return T object being popped.
-         */
-	public T popFront();
+		/**
+		 *  Pops the object from the front.
+		 *  @return T object being popped.
+		 */
+		public T popFront();
 
-        /**
-         *  Pushes the object to the back.
-         *  @param T is item being pushed to the back.
-         */
-	public T popBack();
+		/**
+		 *  Pushes the object to the back.
+		 *  @param T is item being pushed to the back.
+		**/
+		public T popBack();
 
-        /**
-         *  Pops the object in the back.
-         *  @param T is item being pushed to the back.
-         */
-	public T pop();
+		/**
+		 *  Pops the object in the back.
+		 *  @param T is item being pushed to the back.
+		**/
+		public T pop();
 
-        /**
-         *  Gets the DListNode in the Front.
-         *  @return DListNode in the front.
-        **/
-	public DListNode<T> getFront();
+		/**
+		 *  Gets the DListNode in the Front.
+		 *  @return DListNode in the front.
+		**/
+		public DListNode<T> getFront();
 
-        /**
-         *  Gets the object in the back.
-         *  @return DListNode in the back.
-        **/
-	public DListNode<T> getBack();
+		/**
+		 *  Gets the object in the back.
+		 *  @return DListNode in the back.
+		**/
+		public DListNode<T> getBack();
 
-        /**
-         *  Gets the item in a certain location.
-         *  @param index is the position to select from.
-         *  @return a T object at the index.
-        **/
-	public T getItem(int index);
+		/**
+		 *  Gets the item in a certain location.
+		 *  @param index is the position to select from.
+		 *  @return a T object at the index.
+		**/
+		public T getItem(int index);
 
-        /**
-         *  Appends two lists together.
-         *  @param d is a DList being added to the front.
-        **/
-	public void appendFront(DList<T> d);
+		/**
+		 *  Appends two lists together.
+		 *  @param d is a DList being added to the front.
+		**/
+		public void appendFront(DList<T> d);
 
-        /**
-         *  Appends two lists together.
-         *  @param d is a DList being added to the back.
-        **/
-	public void appendBack(DList<T> d);
+		/**
+		 *  Appends two lists together.
+		 *  @param d is a DList being added to the back.
+		**/
+		public void appendBack(DList<T> d);
 
-        /**
-         *  Appends two lists together.
-         *  @param d is a DList being added to the back.
-        **/
-	public void append(DList<T> d);
+		/**
+		 *  Appends two lists together.
+		 *  @param d is a DList being added to the back.
+		**/
+		public void append(DList<T> d);
 
-        /**
-         *  Returns length of DList.
-         *  @return the size of the Dlist.
-         */
-	public int length();
-}
+		/**
+		 *  Returns length of DList.
+		 *  @return the size of the Dlist.
+		 */
+		public int length();
+	}
 Board Module
 ============
 	/**
@@ -199,7 +269,7 @@ Board Module
 	 *	game, throwing an exception whenever a rule violation
 	 *	is encountered.
 	 *	
-	 *	Invariants:
+	 *	Properties:
 	 *  	1. Will throw an exception if a move is illegal.
 	 *  	2. No two chips in any given place.
 	 *  	3. Cannot be three chips adjacent to each other.
@@ -217,42 +287,42 @@ Board Module
 		**/
 		public Board();
 
-                /**
-                 *
-                 *  Incorporates a move into the internal game board.
-                 *  @param m is the move that the board is incorporating.
-                 *  @param color is the color of the player performing the move.
-                 *  @throws InvalidMoveException when a move makes a board invalid.
-                 *
-                **/
-                public void doMove(Move m, int color) throws InvalidMoveException;
+		/**
+		 *
+		 *  Incorporates a move into the internal game board.
+		 *  @param m is the move that the board is incorporating.
+		 *  @param color is the color of the player performing the move.
+		 *  @throws InvalidMoveException when a move makes a board invalid.
+		 *
+		**/
+		public void doMove(Move m, int color) throws InvalidMoveException;
 
-                /**
-                 *
-                 *  Undo a move in the internal game board. 
-                 *
-                 *  NEVER CALL BEFORE CALLING Board.doMove() WITH THE MOVE FIRST! 
-                 *  Board.doMove() MUST NOT THROW AN EXCEPTION. FAILURE TO ADHERE 
-                 *  TO THIS WILL CAUSE VIOLATION OF INVARIANTS.
-                 *  @param m is the move that the board is incorporating.
-                 *  @param color is the color of the player performing the move.
-                 *  @throws InvalidMoveException when a move makes a board invalid.
-                 *
-                **/
-                public void undoMove(Move m, int color) throws InvalidMoveException;
+		/**
+		 *
+		 *  Undo a move in the internal game board. 
+		 *
+		 *  NEVER CALL BEFORE CALLING Board.doMove() WITH THE MOVE FIRST! 
+		 *  Board.doMove() MUST NOT THROW AN EXCEPTION. FAILURE TO ADHERE 
+		 *  TO THIS WILL CAUSE VIOLATION OF INVARIANTS.
+		 *  @param m is the move that the board is incorporating.
+		 *  @param color is the color of the player performing the move.
+		 *  @throws InvalidMoveException when a move makes a board invalid.
+		 *
+		**/
+		public void undoMove(Move m, int color) throws InvalidMoveException;
 
 
-                /**
-                 *
-                 *  Gets the chip at x,y.
-                 *  @param x the target x coordinate
-                 *  @param y the target y coordinate
-                 *  @return the Chip at x,y, or null if there is no chip.
-                 *
-                **/
+		/**
+		 *
+		 *  Gets the chip at x,y.
+		 *  @param x the target x coordinate
+		 *  @param y the target y coordinate
+		 *  @return the Chip at x,y, or null if there is no chip.
+		 *
+		**/
 		public Chip getChip(int x, int y) throws ChipNotFoundException;
 
-               
+			   
 		/**
 		 *
 		 *  Tells whether a chip at x,y exists
@@ -263,42 +333,41 @@ Board Module
 		**/
 		public boolean hasChip(int x, int y);
 
-                /**
-                 *  @return the the number of black chips on the board
-                **/
-                public int numBlack();
+		/**
+		 *  @return the the number of black chips on the board
+		**/
+		public int numBlack();
 
-                /**
-                 * @return the the number of white chips on the board
-                **/
-                public int numWhite();
+		/**
+		 * @return the the number of white chips on the board
+		**/
+		public int numWhite();
 
 
-                /**
-                 *
-                 * Returns whether the game is over.
-                 * @return the color of the winning player, or Constants.NULL_PLAYER if the game is not over.
-                 *
-                **/
-                public int getWinner();
+		/**
+		 *
+		 * Returns whether the game is over.
+		 * @return the color of the winning player, or Constants.NULL_PLAYER if the game is not over.
+		 *
+		**/
+		public int getWinner();
 
-                /**
-                  *
-                  * Returns a string representation of the board. 
-                  * . is empty, X is BLACK, O is WHITE.
-                  * @return a string.
-                  *
-                 **/
-                 public String toString();
+		/**
+		  *
+		  * Returns a string representation of the board. 
+		  * . is empty, X is BLACK, O is WHITE.
+		  * @return a string.
+		  *
+		 **/
+		 public String toString();
 
-                /**
-                 *
-                 * Returns a list of the longest networks.
-                 * @return a DList of networks
-                 *
-                **/
-                public DList<Net> getLongestNetworks();
-
+		/**
+		 *
+		 * Returns a list of the longest networks.
+		 * @return a DList of networks
+		 *
+		**/
+		public DList<Net> getLongestNetworks();
 	}
 
 	/**
@@ -334,16 +403,16 @@ Board Module
 	 *
 	**/
 	public class InvalidMoveException extends Exception{
-                /**
-                 *  An exception thrown when an invalid move is attempted.
-                 *  Prints out message msg.
-                 *  @param message msg to return.
-                **/
-                public class InvalidMoveException(String msg);
-       }                 
+		/**
+		 *  An exception thrown when an invalid move is attempted.
+		 *  Prints out message msg.
+		 *  @param message msg to return.
+		**/
+		public class InvalidMoveException(String msg);
+   }                 
  
-AI Module
-=========
+MachinePlayer Module
+====================
 	/**
 	 *
 	 *	MachinePlayer represents an instance of our AI.
@@ -354,11 +423,11 @@ AI Module
 	**/
 	public class MachinePlayer extends Player{
 
-                /** 
-                 * Creates a machine player with the given color.	
-                 * Color is either 0 (black) or 1 (white). (White has the first move.)
-                **/ 
-                public MachinePlayer(int color);
+		/** 
+		 * Creates a machine player with the given color.	
+		 * Color is either 0 (black) or 1 (white). (White has the first move.)
+		**/ 
+		public MachinePlayer(int color);
 
 		/**
 		 *
@@ -397,36 +466,7 @@ AI Module
 		**/
 		@Override
 		public boolean forceMove(Move m);
-                
-                /**
-                 * Chooses the best move.
-                 * @param currColor color of player.
-                 * @param alpha When greater than beta, stop looking.
-                 * @param beta The variable being compared with.
-                 * @param depth The depth the project is searching through.
-                 * @return if move valid or not.
-                **/                              
 	}
 
 
-Describe the classes, modules, and interfaces you designed before and while you
-implemented the project.  Your description should include:
-  -  A list of the classes your program uses.
-  -  A list of each of the "modules" used in or by MachinePlayer, similar to
-     the list in the "Teamwork" section of the README (but hopefully more
-     detailed).
-  -  For each module, list the class(es) the module is implemented in.
-  -  For each module, say which of your team members implemented it.
-  -  For each module, describe its interface--specifically, the prototype and
-     behavior of each method that is available for external callers (outside
-     the module) to call.  Don't include methods that are only meant to be
-     called from within the module.
 
-     For each method, provide (1) a method prototype and (2) a complete,
-     unambiguous description of the behavior of the method/module.  This
-     description should also appear before the method in your code's comments.
-
-You will probably need to change some of your design decisions as you go; be
-sure to modify this file to reflect these changes before you submit your
-project.  Your design of classes and interfaces with be worth about 10% of your
-grade.
