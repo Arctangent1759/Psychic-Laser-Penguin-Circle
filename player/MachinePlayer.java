@@ -39,6 +39,7 @@ public class MachinePlayer extends Player {
 		this.myName=NAME;
 		this.board=new Board();
 	}
+	
 	/**
 	 * Returns a new move by "this" player.	Internally records the move (updates
 	 * the internal game board) as a move by "this" player.
@@ -53,11 +54,12 @@ public class MachinePlayer extends Player {
 		Constants.print(board);
 		return m;
 	} 
-
-	// If the Move m is legal, records the move as a move by the opponent
-	// (updates the internal game board) and returns true.	If the move is
-	// illegal, returns false without modifying the internal state of "this"
-	// player.	This method allows your opponents to inform you of their moves.
+	/**
+	 * If the Move m is legal, records the move as a move by the opponent
+	 * (updates the internal game board) and returns true.	If the move is
+	 * illegal, returns false without modifying the internal state of "this"
+	 * player.	This method allows your opponents to inform you of their moves.
+	**/
 	public boolean opponentMove(Move m) {
 		try{
 			board.doMove(m,getOppColor(this.color));
@@ -66,12 +68,14 @@ public class MachinePlayer extends Player {
 			return false;
 		}
 	}
-
-	// If the Move m is legal, records the move as a move by "this" player
-	// (updates the internal game board) and returns true.	If the move is
-	// illegal, returns false without modifying the internal state of "this"
-	// player.	This method is used to help set up "Network problems" for your
-	// player to solve.
+	
+	/**
+	 * If the Move m is legal, records the move as a move by "this" player
+	 * (updates the internal game board) and returns true.	If the move is
+	 * illegal, returns false without modifying the internal state of "this"
+	 * player.	This method is used to help set up "Network problems" for your
+	 * player to solve.
+	**/
 	public boolean forceMove(Move m) {
 		try{
 			board.doMove(m,this.color);
@@ -85,7 +89,13 @@ public class MachinePlayer extends Player {
 	//Helper functions
 
 
-	//Use Minimax to recursively finds the optimal move for the player
+	/**
+	 * Use Minimax to recursively finds the optimal move for the player.
+	 * @param currColor color of player.
+	 * @param alpha maximum lower bound.
+	 * @param beta minimum upper bound.
+	 * @param depth how much further tree needs to be searched. 
+	**/
 	private Best chooseBestMove(int currColor, double alpha, double beta, int depth){
 		if (board.numBlack()==10 && board.numWhite()==10){
 			depth=Math.min(depth,STEPSEARCHDEPTH);
@@ -174,8 +184,13 @@ public class MachinePlayer extends Player {
 		}
 		return myBest;
 	}
-
-	//Gets all moves for myColor
+	
+	
+	/**
+	 * Gets all moves for myColor
+	 * @param myColor refers to the player.
+	 * @return DList with all possible moves of that player.
+	**/
 	private DList<Move> getAllMoves(int myColor){
 		DList<Move> moves = new DList<Move>();
 		for (int x = 0; x < Constants.BOARDWIDTH; x++){
@@ -201,9 +216,14 @@ public class MachinePlayer extends Player {
 		}
 		return moves;
 	}
-
-	//Returns the score of the current board
-	//Scores go from -2 to 2. All scores above 1 are winning moves, and all scores below -1 are losing moves.
+	
+	
+	/**
+	 * Returns the score of the current board
+	 * Scores go from -2 to 2. All scores above 1 are winning moves, and all scores below -1 are losing moves.
+	 * @param depth how much further the tree needs to search.
+	 * @return score.
+	**/
 	private double scoreBoard(int depth){
 		DList<Net> networks = board.getLongestNetworks();
 		int size = networks.length();
@@ -248,8 +268,11 @@ public class MachinePlayer extends Player {
 		return score;
 		
 	}
-
-	//Returns opponent color
+	/**
+	 * Returns opponent color
+	 * @param c color of opponent.
+	 * @return other color.
+	**/
 	private int getOppColor(int c){
 		if (c==Constants.BLACK){
 			return Constants.WHITE;
@@ -261,6 +284,8 @@ public class MachinePlayer extends Player {
 	}
 
 }
+
+//Class that represents a move and a score. Used to represent the best move.
 class Best{
 	protected Move move;
 	protected double score;
