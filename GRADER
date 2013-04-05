@@ -34,17 +34,24 @@ constructor?
 	Default search levels: 4
 
 Describe your board evaluation function in some detail.
+
 	First, we check if there is a winner. If the winner is our MachinePlayer, return
-	a score of 1.0+k, where k is a numer between 0 and 1 scaled based on the depth of
-	the recursive call for which the board is scored. If the winner is the opponent, return
-	-1 - k. This ensures that winning boards that allow the MachinePlayer to win in fewer 
-	turns score higher than winning boards that allow the MachinePlayer to win in more turns. 
-	Losing in more turns will score higher than losing in fewer turns.
+	a score of Constants.START_BETA(2)-k, where k is a numer between 0 and 0.08 scaled based on the depth of
+	the recursive call for which the board is scored. This ensures that winning boards that allow the MachinePlayer 
+	to win in fewer turns score higher than winning boards that allow the MachinePlayer to win in more turns. 
+	
+	If the winner is the opponent, return Constants.START_ALPHA(-2). We felt as if they were no need to check if we were going to
+	lose in a couple of turns or immediately since the outcome is the same (assuming both AI's are smart).
+	
 	If there is no winner, our getNetworks function gets the list of all networks that
 	are on board that are attached to a goal. We square the length of each network, thereby
 	rewarding longer networks for our MachinePlayer and punishing longer networks for
-	the opponent. Then, we take the ratio of the sum of the squared lengths of our MachinePlayer's
+	the opponent. 
+	
+	Then, we take the ratio of the sum of the squared lengths of our MachinePlayer's
 	networks to the sum of the squared lengths of the opponent's networks, and return this quantity.
+	The normalizing of the score ensures that the score lies within the range of Constants.START_ALPHA 
+	and Constants.START_BETA.
 
 
 Does your MachinePlayer use any special method of choosing the first few moves?
