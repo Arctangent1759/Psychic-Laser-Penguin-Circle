@@ -196,20 +196,4 @@ public class DList<T>{
 		}
 		return out+"]";
 	}
-
-	//Tests
-	public static void main(String[] args){
-		DList<Integer> d = new DList<Integer>();
-		d.push(0);
-		d.push(1);
-		d.push(2);
-		d.push(3);
-		d.push(4);
-		d.push(5);
-		DList<Integer> e = new DList<Integer>();
-		e.push(2);
-		d.appendBack(e);
-		System.out.println(d);
-		System.out.println(e);
-	}
 }
