@@ -174,64 +174,7 @@ public class DList<T>{
          *      @return the size of the Dlist.
          */
 	public int length();
-
-
 }
-HashTable Module
-============
-	/**
-	 *	
-	 *	HashTable stores the boards, allowing for quicker access and 
-         *      improving the speed of the problem. It uses the DList module.
-	 *	
-	 *	Invariants:
-	 *  	1. A key should only have one value.
-         *      
-	 *	
-	**/
-
-	/**
-	 *       Constructor of the bucket.
-         *       @param numBuckets represents expected size of hashTable. 
-	**/ 
-	public HashTable(int sizeExpected);
-
-	/**
-	 *      Compresses the hash so it fits inside the bucket.
-	 *	@param hash is the hash being compressed.
-	 *	@return the compressed hash.
-	**/
-	public int compress(int hash);
-
-	/**
-	 *	Adds an entry to the HashTable.
-	 *	@param object h, value.
-	 *      @return nothing.
-	 *
-	**/
-	public void add(Object h, Object value);
-
-        /**
-	 *	Gets an entry to the HashTable.
-	 *	@param object h, value.
-	 *      @return nothing.
-	 *
-	**/
-	public Entry get(Object key);
-
-        /**
-	 *      Testing function creating representation of board.
-	 *      @return a random board.
-	**/
-         public static String randomBoard();
-        
-        /**
-         *      Another testing function.
-         *      Prints the number of collisions.
-         */
-        public void countCollisions()
-
-
 Board Module
 ============
 	/**
@@ -505,58 +448,18 @@ Board Module
 
 	/**
 	 *
-	 *	An exception thrown when a player attempts to create a chip at an invalid location
+	 *	An exception thrown when an invalid move is attempted.
 	 *
 	**/
-	public class InvalidChipException extends Exception{
-
-		/**
-		 *
-		 *	Constructs an InvalidChipException
-		 *	@param s the message of the exception
-		 *	@param x the x coordinate of the invalid chip
-		 *	@param y the y coordinate of the invalid chip
-		 *
-		**/
-		public InvalidChipException(String s, int x, int y);
-	}
-
-	/**
-	 *
-	 *	An exception thrown when a player attemps to get a chip not on the board
-	 *
-	**/
-	public class ChipNotFoundException extends Exception{
-
-		/**
-		 *
-		 *	Constructs a ChipNotFoundException
-		 *	@param s the message of the exception
-		 *	@param x the x coordinate of the invalid chip query
-		 *	@param y the y coordinate of the invalid chip query
-		 *
-		**/
-		public ChipNotFoundException(String s, int x, int y);
-	}
-
-	/**
-	 *
-	 *	An exception thrown when a player attemps to move a chip to an illegal square.
-	 *
-	**/
-	public class IllegalChipMoveException extends Exception{
-
-		/**
-		 *
-		 *	Constructs a IllegalChipMoveException
-		 *	@param s the message of the exception
-		 *	@param x the x coordinate of the invalid chip move
-		 *	@param y the y coordinate of the invalid chip move
-		 *
-		**/
-		public IllegalChipMoveException(String s, int x, int y);
-	}
-
+	public class InvalidMoveException extends Exception{
+                /**
+                 *	An exception thrown when an invalid move is attempted.
+                 *      Prints out message msg.
+                 *      @param message msg to return.
+                **/
+                public class InvalidMoveException(String msg);
+       }                 
+ 
 AI Module
 =========
 	/**
