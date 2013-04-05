@@ -42,46 +42,11 @@ Does your MachinePlayer use any special method of choosing the first few moves?
 Is there anything else the graders should know to help them read your project?
 
 
+
+
 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-*********           Commandments:             ********
+*********           List of Functions:             ********
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	Anyone found in violation of the folowing statutes will be summarily executed.
-
-	General
-	-------
-		1. Don't be a dick.
-
-	Formatting and Readability
-	--------------------------
-		1. Single tabs, not spaces
-		2. Don't use i, j, k
-		3. Use Camel case
-		4. When in doubt, comment.
-		5. Multiline comment docstrings
-		6. Specify orders of growth for all your functions.
-	
-	Coding Style
-	------------
-		1. Always use override decorator
-		2. When in doubt, use protected
-		3. Use constants when available, not values.
-		4. Abstraction!
-
-	Github and Collaboration
-	------------------------
-		1. Do not push untested or disfunctional code to github.
-		2. Push and test often if editing shared file like Constants
-	
-	Debugging
-	---------
-		1. Use Constants.print, not System.out.println
-
-
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++
-*********          Interface Design           ********
-++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 Constants
 =========
 	/**
@@ -118,8 +83,100 @@ Constants
 		 *
 		**/
 		public static final void print(Object o);
-
 	}
+
+DList Module
+===========
+public class DList<T>{
+        /**
+        * An enhanced version of the homework version of DListNode, with generics.
+        **/
+
+        //DList Constructor
+	public DList();
+
+        /**
+         *      Figures out if the function is a boolean or not.
+         *      @return a boolean stating if Dlist is empty or not.
+         */
+	public boolean isEmpty();
+
+
+        /**
+         *      Pushes the object to th front.
+         *      @param T is item being pushed to the front.
+         */
+	public void pushFront(T item);
+
+        /**
+         *      Pushes the object to the back.
+         *      @param T is item being pushed to the back.
+         */
+	public void pushBack(T item);
+
+        /**
+         *      Pops the object from the front.
+         *      @return T object being popped.
+         */
+	public T popFront();
+
+        /**
+         *      Pushes the object to the back.
+         *      @param T is item being pushed to the back.
+         */
+	public T popBack();
+
+        /**
+         *      Pops the object in the back.
+         *      @param T is item being pushed to the back.
+         */
+	public T pop();
+
+       /**
+         *      Gets the DListNode in the Front.
+         *      @return DListNode in the front.
+         */
+	public DListNode<T> getFront();
+
+        /**
+         *      Gets the object in the back.
+         *      @return DListNode in the back.
+         */
+	public DListNode<T> getBack();
+
+        /**
+         *      Gets the item in a certain location.
+         *      @param index is the position to select from.
+         *      @return a T object at the index.
+         */
+	public T getItem(int index);
+
+        /**
+         *      Appends two lists together.
+         *      @param d is a DList being added to the front.
+         */
+	public void appendFront(DList<T> d);
+
+        /**
+         *      Appends two lists together.
+         *      @param d is a DList being added to the back.
+         */
+	public void appendBack(DList<T> d);
+
+        /**
+         *      Appends two lists together.
+         *      @param d is a DList being added to the back.
+         */
+	public void append(DList<T> d);
+
+        /**
+         *      Returns length of DList.
+         *      @return the size of the Dlist.
+         */
+	public int length();
+
+
+}
 HashTable Module
 ============
 	/**
