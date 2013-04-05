@@ -14,7 +14,7 @@ public class MachinePlayer extends Player {
 	//Constants
 	protected static int DEFAULTSEARCHDEPTH=4;
 	protected static int STEPSEARCHDEPTH=1;
-	protected static int HASHSIZE=100000;				//TODO: Determine appropriate search depth.
+	protected static int HASHSIZE=1000;				//TODO: Determine appropriate search depth.
 	protected static String NAME="Alan Turing";
 	
 
@@ -24,21 +24,14 @@ public class MachinePlayer extends Player {
 	protected Board board;
 	protected HashTable boardCache;
 
-	/** 
-        *       Creates a machine player with the given color.	Color is either 0 (black)
-	*       or 1 (white).	(White has the first move.)
-        *       @param The color.
-        *       @return The player with the specified color.
-        **/
+	// Creates a machine player with the given color.	Color is either 0 (black)
+	// or 1 (white).	(White has the first move.)
 	public MachinePlayer(int color) {
 	  this(color,DEFAULTSEARCHDEPTH);
 	}
 
-	/** 
-         *       Returns a new move by "this" player. Internally records the move (updates
-	 *       the internal game board) as a move by "this" player.
-         *       @return Move.
-         **/
+	// Creates a machine player with the given color and search depth.	Color is
+	// either 0 (black) or 1 (white).	(White has the first move.)
 	public MachinePlayer(int color, int searchDepth) {
 		this.color=color;
 		this.searchDepth=searchDepth;
@@ -47,10 +40,8 @@ public class MachinePlayer extends Player {
 		this.boardCache = new HashTable(HASHSIZE);
 	}
 
-	/**     Returns a new move by "this" player.	Internally records the move (updates
-	 *      the internal game board) as a move by "this" player.
-         *      @return Move.
-        **/
+	// Returns a new move by "this" player.	Internally records the move (updates
+	// the internal game board) as a move by "this" player.
 	public Move chooseMove() {
 		Move m = chooseBestMove(color,Constants.START_ALPHA,Constants.START_BETA,searchDepth).move;
 		try{
@@ -62,14 +53,10 @@ public class MachinePlayer extends Player {
 		return m;
 	} 
 
-	/**
-         *      If the Move m is legal, records the move as a move by the opponent
-	 *      (updates the internal game board) and returns true.	If the move is
-	 *      illegal, returns false without modifying the internal state of "this"
-         *      player.	This method allows your opponents to inform you of their moves.
-         *      @param the Move being checked.
-         *      @return the boolean stating if the move is valid.
-        **/
+	// If the Move m is legal, records the move as a move by the opponent
+	// (updates the internal game board) and returns true.	If the move is
+	// illegal, returns false without modifying the internal state of "this"
+	// player.	This method allows your opponents to inform you of their moves.
 	public boolean opponentMove(Move m) {
 		try{
 			board.doMove(m,getOppColor(this.color));
@@ -79,15 +66,11 @@ public class MachinePlayer extends Player {
 		}
 	}
 
-	/**
-         *      If the Move m is legal, records the move as a move by "this" player
-	 *      (updates the internal game board) and returns true.	If the move is
-	 *      illegal, returns false without modifying the internal state of "this"
-	 *      player.	This method is used to help set up "Network problems" for your
-	 *      player to solve
-         *      @param move m.
-         *      @return if move valid or not.
-        **/
+	// If the Move m is legal, records the move as a move by "this" player
+	// (updates the internal game board) and returns true.	If the move is
+	// illegal, returns false without modifying the internal state of "this"
+	// player.	This method is used to help set up "Network problems" for your
+	// player to solve.
 	public boolean forceMove(Move m) {
 		try{
 			board.doMove(m,this.color);
@@ -101,14 +84,7 @@ public class MachinePlayer extends Player {
 	//Helper functions
 
 
-	/**
-         *      Chooses the best move.
-         *      @param currColor color of player.
-         *      @param alpha When greater than beta, stop looking.
-         *      @param beta The variable being compared with.
-         *      @param depth The depth the project is searching through.
-         *      @return if move valid or not.
-        **/
+	//Use Minimax to recursively finds the optimal move for the player
 	private Best chooseBestMove(int currColor, double alpha, double beta, int depth){
 		if (board.numBlack()==10 && board.numWhite()==10){
 			depth=Math.min(depth,STEPSEARCHDEPTH);
@@ -202,11 +178,7 @@ public class MachinePlayer extends Player {
 		return myBest;
 	}
 
-	/**
-         *      Finds all of the moves or one color.
-         *      @param myColor color of current player in beta.
-         *      @return A list of moves.
-        **/
+	//Gets all moves for myColor
 	private DList<Move> getAllMoves(int myColor){
 		DList<Move> moves = new DList<Move>();
 		for (int x = 0; x < Constants.BOARDWIDTH; x++){
@@ -233,28 +205,25 @@ public class MachinePlayer extends Player {
 		return moves;
 	}
 
-	/**
-         *      Scores the board.
-         *      @param depth it's checking for.
-         *      @return the score of the move.
-        **/
+	//Returns the score of the current board
+	//Scores go from -2 to 2. All scores above 1 are winning moves, and all scores below -1 are losing moves.
 	private double scoreBoard(int depth){
 		DList<Net> networks = board.getLongestNetworks();
 		int size = networks.length();
 		double score = 0;
 		while (!networks.isEmpty()) {
 			Net network = networks.pop();
-			
+			/**
 			if (boardCache.get(board.hashCode()) != null) {
 				return ((double) boardCache.get(board.hashCode()).value());
 			}
-			
+			**/
 			if (board.getWinner() == getOppColor(color)) {
-				boardCache.add(board.hashCode(), (double)Constants.START_ALPHA);
+				//boardCache.add(board.hashCode(), (double)Constants.START_ALPHA);
 				return ((double)Constants.START_ALPHA);
 			}
 			else if (board.getWinner() == color) {
-				boardCache.add(board.hashCode(), (double)Constants.START_BETA);
+				//boardCache.add(board.hashCode(), (double)Constants.START_BETA);
 				if (depth == 0) {
 					return ((double)Constants.START_BETA) - 0.08;
 				}
@@ -289,16 +258,12 @@ public class MachinePlayer extends Player {
 		score = ((score / (((double) Constants.WINNING_NETWORK) * 
 			   ((double) Constants.WINNING_NETWORK))) / size * 
 			   ((double)Constants.START_BETA)); 
-		boardCache.add(board.hashCode(), score);
+		//boardCache.add(board.hashCode(), score);
 		return score;
 		
 	}
 
-	/**
-         *      Gets the color of the opponent.
-         *      @param the color of the object now.
-         *      @return the color of opponent.
-        **/
+	//Returns opponent color
 	private int getOppColor(int c){
 		if (c==Constants.BLACK){
 			return Constants.WHITE;
@@ -310,9 +275,6 @@ public class MachinePlayer extends Player {
 	}
 
 }
-/**
- *      Object that stores the best move.
-**/
 class Best{
 	protected Move move;
 	protected double score;
