@@ -31,7 +31,7 @@ public class MachinePlayer extends Player {
 	
 	/**
 	 * Creates a machine player with the given color and search depth. Color is
-	 * either 0 (black) or 1 (white).(White has the first move.)
+	 * either 0 (black) or 1 (white). (White has the first move.)
 	**/
 	public MachinePlayer(int color, int searchDepth) {
 		this.color=color;
@@ -94,10 +94,11 @@ public class MachinePlayer extends Player {
 
 	/**
 	 * Use Minimax to recursively finds the optimal move for the player.
-	 * @param currColor color of player.
-	 * @param alpha maximum lower bound.
-	 * @param beta minimum upper bound.
-	 * @param depth how much further tree needs to be searched. 
+	 * @param currColor color of the player being simulated in the current 
+	 * 		  recursive call.
+	 * @param alpha the worst case score for machinePlayer.
+	 * @param beta the best case score for the opponent.
+	 * @param depth the depth of the current recursive call.
 	**/
 	private Best chooseBestMove(int currColor, double alpha, double beta, int depth){
 		if (board.numBlack()==10 && board.numWhite()==10){
@@ -161,7 +162,8 @@ public class MachinePlayer extends Player {
 				return myBest;
 			}
 		}
-		if (myBest.move.moveKind==Move.QUIT){
+
+		if (myBest.move.moveKind==Move.QUIT){ //No good moves found. Find some random move and do it.
 			moves = getAllMoves(currColor);
 			while (!moves.isEmpty()){//For each move
 				m=moves.pop();
@@ -190,9 +192,11 @@ public class MachinePlayer extends Player {
 	
 	
 	/**
+	 *
 	 * Gets all moves for myColor
 	 * @param myColor refers to the player.
-	 * @return DList with all possible moves of that player.
+	 * @return DList with all possible moves (some legal, some illegal) of that player.
+	 *
 	**/
 	private DList<Move> getAllMoves(int myColor){
 		DList<Move> moves = new DList<Move>();
@@ -274,9 +278,11 @@ public class MachinePlayer extends Player {
 	
 	
 	/**
-	 * Returns opponent color
-	 * @param c color of opponent.
-	 * @return other color.
+	 *
+	 * Returns the color opposite to a given color
+	 * @param c the color in question
+	 * @return the opposite color.
+	 *
 	**/
 	private int getOppColor(int c){
 		if (c==Constants.BLACK){
@@ -290,10 +296,24 @@ public class MachinePlayer extends Player {
 
 }
 
-//Class that represents a move and a score. Used to represent the best move.
+/**
+ *
+ *	Class that represents a move and a score. 
+ *	Used to represent the best move.
+ *	Used exclusively by MachinePlayer.chooseBestMove 
+ *	and MachinePlayer.chooseMove.
+ *
+**/
 class Best{
 	protected Move move;
 	protected double score;
+	/**
+	 *
+	 *	Constructs a new Best object.
+	 *	@param m the move being changed.
+	 *	@param s the score of the move.
+	 *
+	**/
 	public Best(Move m, double s){
 		this.move=m;
 		this.score=s;
