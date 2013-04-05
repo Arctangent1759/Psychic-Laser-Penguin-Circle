@@ -6,8 +6,8 @@ import DList.*;
 import Constants.Constants;
 
 /**
- *	An implementation of an automatic Network player.	Keeps track of moves
- *	made by both players.	Can select a move for itself.
+ *	An implementation of an automatic Network player.Keeps track of moves
+ *	made by both players. Can select a move for itself.
  */
 public class MachinePlayer extends Player {
 	//Constants
@@ -22,16 +22,16 @@ public class MachinePlayer extends Player {
 	protected Board board;
 
 	/** 
-	 * Creates a machine player with the given color.	Color is either 0 (black)
-	 * or 1 (white).	(White has the first move.)
+	 * Creates a machine player with the given color.	
+	 * Color is either 0 (black) or 1 (white). (White has the first move.)
 	**/ 
 	public MachinePlayer(int color) {
 	  this(color,DEFAULTSEARCHDEPTH);
 	}
 	
 	/**
-	 * Creates a machine player with the given color and search depth.	Color is
-	 * either 0 (black) or 1 (white).	(White has the first move.)
+	 * Creates a machine player with the given color and search depth. Color is
+	 * either 0 (black) or 1 (white).(White has the first move.)
 	**/
 	public MachinePlayer(int color, int searchDepth) {
 		this.color=color;
