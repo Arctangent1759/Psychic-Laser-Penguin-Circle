@@ -40,6 +40,7 @@ public class MachinePlayer extends Player {
 		this.board=new Board();
 	}
 	
+	
 	/**
 	 * Returns a new move by "this" player.	Internally records the move (updates
 	 * the internal game board) as a move by "this" player.
@@ -54,6 +55,8 @@ public class MachinePlayer extends Player {
 		Constants.print(board);
 		return m;
 	} 
+	
+	
 	/**
 	 * If the Move m is legal, records the move as a move by the opponent
 	 * (updates the internal game board) and returns true.	If the move is
@@ -268,6 +271,8 @@ public class MachinePlayer extends Player {
 		return score;
 		
 	}
+	
+	
 	/**
 	 * Returns opponent color
 	 * @param c color of opponent.
