@@ -26,8 +26,8 @@ public final class Constants{
 	public static final int MAX_CHIPS=10; //The maximum number of chips in the game
 	
 	// Machine Player Constants
-	public static final int START_ALPHA = -2;
-	public static final int START_BETA = 2;
+	public static final int START_ALPHA = -2; //Minimum alpha value
+	public static final int START_BETA = 2; //Maximum beta value
 
 
 	//Debugging and misc.
@@ -36,6 +36,7 @@ public final class Constants{
 	/**
 	 *
 	 *	Prints o to stdout, if DEBUG is true.
+	 *	Used for debugging purposes.
 	 *	@param o The object to be printed
 	 *
 	**/
@@ -44,6 +45,16 @@ public final class Constants{
 			System.err.println(o);
 		}
 	}
+
+	/**
+	 *
+	 *	Tests string value of o against the string value of expected
+	 *	and stops the program on fail with an error message.
+	 *	Used exclusively for debugging purposes.
+	 *	@param expected The expected value
+	 *	@param o The object to be tested
+	 *
+	**/
 	public static final void printTest(Object expected, Object o){
 		print("---------------------");
 		print("\tExpected: " + expected.toString() + "\n\tObserved: " + o.toString());

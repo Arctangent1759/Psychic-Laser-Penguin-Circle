@@ -7,8 +7,8 @@
 package Board;
 
 public class Chip{
-	protected int color;
-	protected boolean visited;
+	protected int color; //Color of the chip
+	protected boolean visited; //Used by Board.getLongestNetworks to temporarily mark chips "visited"
 
 	/**
 	 *

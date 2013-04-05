@@ -85,10 +85,7 @@ public class Board{
 	/**
 	 *
 	 *	Undo a move in the internal game board. 
-	 *
-	 *	NEVER CALL BEFORE CALLING Board.doMove() WITH THE MOVE FIRST! 
-	 *	Board.doMove() MUST NOT THROW AN EXCEPTION. FAILURE TO ADHERE 
-	 *	TO THIS WILL CAUSE VIOLATION OF INVARIANTS.
+	 *	Precondition: doMove has been called on the move first
 	 *
 	 *	@param m is the move that the board is incorporating.
 	 *	@param color is the color of the player performing the move.
@@ -121,7 +118,7 @@ public class Board{
 	 *	@throws InvalidMoveException when a move makes a board invalid.
 	 *
 	**/
-	public void moveChip(int x1, int y1, int x2, int y2, int color) throws InvalidMoveException{
+	protected void moveChip(int x1, int y1, int x2, int y2, int color) throws InvalidMoveException{
 		if (numWhite!=Constants.MAX_CHIPS || numBlack!=Constants.MAX_CHIPS){
 			throw new InvalidMoveException("Tried to move chip before maximum number of chips have been placed.");
 		}
@@ -185,7 +182,7 @@ public class Board{
 	 *	@param y the destination y coorinate
 	 *
 	**/
-	public void addChip(int color, int x, int y) throws InvalidMoveException{
+	protected void addChip(int color, int x, int y) throws InvalidMoveException{
 		//Update the number of chips.
 		if (color == Constants.WHITE) {
 			numWhite++;
@@ -238,16 +235,16 @@ public class Board{
 		}
 	}
 
-        /**
+	/**
 	 *
 	 *	Removes chip at x,y.
-
+	 *
 	 *	@param x the x coordinate
 	 *	@param y the y coordinate
-         *      @return the chip.
+	 *  @return the chip.
 	 *
 	**/
-	public void removeChip(int x, int y){
+	protected void removeChip(int x, int y){
 		if (getChip(x,y).color==Constants.BLACK){
 			numBlack--;
 		}else if(getChip(x,y).color==Constants.WHITE){
@@ -296,54 +293,6 @@ public class Board{
 		return grid[x][y]!=null;
 	}
         
-        
-	/**
-	 *
-	 *	Returns whether this Chip a is line of sight with Chip b
-	 *	@param x1,y1 are the coordinates of the chip of reference.
-	 *	@param x2,y2 are the coordinates of the chip for comparison
-	 *	@return whether the chip is line of sight with b
-	 *
-	**/
-	public boolean isLOS(int x1,int x2,int y1,int y2) {
-		return !(x1==x2 || y1==y2 || Math.abs((y2-y1)/(x2-x1))==1);
-	}
-	
-        /**
-         *      Returns whether the board is full or not. This is when 10 white chips
-         *      and 10 black chips are on the field.
-         *      @return whether the board is full or not.
-         * 
-         **/
-        public boolean isFull(){
-            return numWhite==Constants.MAX_CHIPS && numBlack == Constants.MAX_CHIPS;
-        }
-        
-	/**
-	 *
-	 *	Returns whether chip 1 interrupts the path between chips 2 and 3.
-	 *	@param x1, y1 the reference chip
-	 *	@param x2, y2 the second chip
-	 *	@param x3, y3 the third chip
-	 *	@return whether this chip is between 2 and 3.
-	 *
-	**/
-	public boolean isInterruptPath(int x1, int y1, int x2, int y2, int x3, int y3) {
-		//If 2 and 3 do not form a valid Network path, then no interruption occurs.
-		if (!isLOS(x2,y2,x3,y3)){
-			return false;
-		}
-
-		//Check if 1 is in the rectangle bounded by 2 and 3.
-		if (!(((x1 > x2 && x1 < x3) || (x1 > x3 && x1 < x2)) && (y1 > y2 && y1 < y3) || (y1 > y3 && y1 < y2))){
-			return false;
-		}
-
-		//Check 1 is on the path between 2 and 3.
-		return y1==y2+(Math.abs((y2-y3)/(x2-x3)))*(x1-x2);
-	}
-
-                
 	/**
 	 *
 	 * Checks for valid chip location.
@@ -354,7 +303,7 @@ public class Board{
 	 * @return boolean that states if the chip location is valid.
 	 *
 	**/
-	public boolean isValid(){
+	protected boolean isValid(){
 		//Enforce chip placement rule 1. Cannot place in corners.
 		if (hasChip(0,0) || hasChip(Constants.BOARDWIDTH-1,0) || hasChip(0,Constants.BOARDHEIGHT-1) || hasChip(Constants.BOARDWIDTH-1,Constants.BOARDHEIGHT-1)){
 			return false;
@@ -455,7 +404,7 @@ public class Board{
 	}
 
                 
-        /**
+	/**
 	 *
 	 * Returns a string representation of the board. 
 	 * . is empty, X is BLACK, O is WHITE.
@@ -481,13 +430,6 @@ public class Board{
 		}
 		return out;
 	}
-        /**
-         * 
-         * @return the key of the object.
-        **/
-	public String getKey(){
-		return this.toString();
-	}
 
 	/**
 	 *
@@ -498,19 +440,29 @@ public class Board{
 
 	public DList<Net> getLongestNetworks(){
 		DList<Net> out = new DList<Net>();
+		//Iterate down the goal rows. For each chip in the goal rows, find all networks (partial or full) touching said chip.
 		for (int x = 0; x < Constants.BOARDWIDTH;x++){
+			//Top goal
 			if (hasChip(x,0)){
+				//Append the networks involving each goal chip to the list
 				out.append(expandLongestNetFromChip(x,0,0,0,x,0));
 			}
+			//Bottom goal
 			if (hasChip(x,Constants.BOARDWIDTH-1)){
+				//Append the networks involving each goal chip to the list
 				out.append(expandLongestNetFromChip(x,Constants.BOARDWIDTH-1,0,0,x,Constants.BOARDWIDTH-1));
 			}
 		}
+		//Iterate down the goal rows. For each chip in the goal rows, find all networks touching said chip.
 		for (int y = 0; y < Constants.BOARDHEIGHT;y++){
+			//Left goal
 			if (hasChip(0,y)){
+				//Append the networks involving each goal chip to the list
 				out.append(expandLongestNetFromChip(0,y,0,0,0,y));
 			}
+			//Right goal
 			if (hasChip(Constants.BOARDHEIGHT-1,y)){
+				//Append the networks involving each goal chip to the list
 				out.append(expandLongestNetFromChip(Constants.BOARDHEIGHT-1,y,0,0,Constants.BOARDHEIGHT-1,y));
 			}
 		
@@ -519,15 +471,15 @@ public class Board{
 	}
 
                 
-        /**
+	/**
 	 *
 	 * Finds the longest network.
-         * @param x is x value of the chip.
-         * @param y is the y value of the chip.
-         * @param last_direction is the last_direction the chip went in.
-         * @param depth is referring to how far the object goes down.
-         * @param origin_x is referring to the x-coordinate the original goal was in.
-         * @param origin_y is referring to the y-coordinate the original goal was in.
+	 * @param x is x value of the chip.
+	 * @param y is the y value of the chip.
+	 * @param last_direction is the last_direction the chip went in.
+	 * @param depth is referring to how far the object goes down.
+	 * @param origin_x is referring to the x-coordinate the original goal was in.
+	 * @param origin_y is referring to the y-coordinate the original goal was in.
 	 * @return a DList of networks
 	 *
 	**/
@@ -545,7 +497,7 @@ public class Board{
 		boolean isDeadEnd=true;
 
 		//Check Base Cases
-		if (!(x==origin_x && y==origin_y)) //Add exception for first node
+		if (!(x==origin_x && y==origin_y)) //Add exception for first node, since it must be in a goal row.
 		{
 			if (c.getColor() == Constants.WHITE && (x==0 || x==Constants.BOARDWIDTH-1)){
 				if (x==origin_x){
@@ -679,29 +631,10 @@ public class Board{
 		return out;
 	}
 
-	/**
-	 *
-	 * Returns a hashcode based on base3.
-	 * @return a DList of networks
-	 *
-	**/
 
-	public int hashCode(){
-        String s = toString();
-        int total=0;
-        int pow = 1;
-        for(int boardSize = 0; boardSize<64; boardSize++){
-            if(s.charAt(boardSize) ==  'X'){
-                total = total + pow*1;
-            }  
-            if(s.charAt(boardSize) == 'O'){
-                total = total + pow*2;
-            }
-                pow *= 3;
-            }
-            return total;
-	}
-
+	//-------------------
+	//		Tests
+	//-------------------
 
 	public static void main(String[] args){
 		testNetworkGetterInteractive();
@@ -959,14 +892,6 @@ public class Board{
 
 	}
         
-        /**
-	 *
-	 * Returns the color of a position as a string.
-         * @param integer refers to the location.
-	 * @return a DList of networks
-	 *
-	**/
-
 	private static String colorStr(int c){
 		if (c==Constants.BLACK){
 			return "black";
