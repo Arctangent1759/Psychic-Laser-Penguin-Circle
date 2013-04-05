@@ -2,7 +2,6 @@
 
 package player;
 import Board.*;
-import HashTable.*;
 import DList.*;
 import Constants.Constants;
 
@@ -14,7 +13,6 @@ public class MachinePlayer extends Player {
 	//Constants
 	protected static int DEFAULTSEARCHDEPTH=4;
 	protected static int STEPSEARCHDEPTH=1;
-	protected static int HASHSIZE=1000;				//TODO: Determine appropriate search depth.
 	protected static String NAME="Alan Turing";
 	
 
@@ -22,26 +20,29 @@ public class MachinePlayer extends Player {
 	protected int searchDepth;
 	protected int color;
 	protected Board board;
-	protected HashTable boardCache;
 
-	// Creates a machine player with the given color.	Color is either 0 (black)
-	// or 1 (white).	(White has the first move.)
+	/** 
+	 * Creates a machine player with the given color.	Color is either 0 (black)
+	 * or 1 (white).	(White has the first move.)
+	**/ 
 	public MachinePlayer(int color) {
 	  this(color,DEFAULTSEARCHDEPTH);
 	}
-
-	// Creates a machine player with the given color and search depth.	Color is
-	// either 0 (black) or 1 (white).	(White has the first move.)
+	
+	/**
+	 * Creates a machine player with the given color and search depth.	Color is
+	 * either 0 (black) or 1 (white).	(White has the first move.)
+	**/
 	public MachinePlayer(int color, int searchDepth) {
 		this.color=color;
 		this.searchDepth=searchDepth;
 		this.myName=NAME;
 		this.board=new Board();
-		this.boardCache = new HashTable(HASHSIZE);
 	}
-
-	// Returns a new move by "this" player.	Internally records the move (updates
-	// the internal game board) as a move by "this" player.
+	/**
+	 * Returns a new move by "this" player.	Internally records the move (updates
+	 * the internal game board) as a move by "this" player.
+	**/
 	public Move chooseMove() {
 		Move m = chooseBestMove(color,Constants.START_ALPHA,Constants.START_BETA,searchDepth).move;
 		try{
@@ -103,13 +104,9 @@ public class MachinePlayer extends Player {
 
 		//Otherwise, commence alpha-beta pruning and game tree search
 		if (currColor==this.color){	//Curr Player is Machine
-			//if (myBest.score > alpha) {							//TODO:JONG WHAT THE FUCK WERE YOU THINKING
-				myBest.score = alpha;
-			//}
+			myBest.score = alpha;
 		}else{	//Curr Player is human
-			//if (myBest.score < beta) {
-				myBest.score = beta;
-			//}
+			myBest.score = beta;
 		}
 
 		//Get all moves
@@ -213,41 +210,31 @@ public class MachinePlayer extends Player {
 		double score = 0;
 		while (!networks.isEmpty()) {
 			Net network = networks.pop();
-			/**
-			if (boardCache.get(board.hashCode()) != null) {
-				return ((double) boardCache.get(board.hashCode()).value());
-			}
-			**/
 			if (board.getWinner() == getOppColor(color)) {
-				//boardCache.add(board.hashCode(), (double)Constants.START_ALPHA);
 				return ((double)Constants.START_ALPHA);
 			}
 			else if (board.getWinner() == color) {
-				//boardCache.add(board.hashCode(), (double)Constants.START_BETA);
-				if (depth == 0) {
-					return ((double)Constants.START_BETA) - 0.08;
-				}
-				return ((double)Constants.START_BETA) - depth/10.0 + depth / 9.0 - 0.08;
+				return ((double)Constants.START_BETA) - depth/10.0 + depth / 9.0 - 0.08; //Rewards shallow depth. 
 			}
 			else {
 				if (network.getPlayer() == color) {
 					if (network.getLength() <= Constants.WINNING_NETWORK) {
-						score += (network.getLength() * network.getLength());
+						score += (network.getLength() * network.getLength()); //Rewards longer length
 					}
 					else {
 						score += (((double)network.getLength())/
-								 (Constants.WINNING_NETWORK) * 
-								 (network.getLength())/(Constants.WINNING_NETWORK));
+							(Constants.WINNING_NETWORK) * 
+							(network.getLength())/(Constants.WINNING_NETWORK));
 					}
 				}
 				else if (network.getPlayer() == getOppColor(color)) {
 					if (network.getLength() <= Constants.WINNING_NETWORK) {
-						score -= (network.getLength() * network.getLength());
+						score -= (network.getLength() * network.getLength()); //Rewards longer length
 					}
 					else {
 						score -= (((double)network.getLength())/
-								 (Constants.WINNING_NETWORK) * 
-								 (network.getLength())/(Constants.WINNING_NETWORK));
+							(Constants.WINNING_NETWORK) * 
+							(network.getLength())/(Constants.WINNING_NETWORK));
 					}
 				}
 				else {
@@ -256,9 +243,8 @@ public class MachinePlayer extends Player {
 			}
 		}
 		score = ((score / (((double) Constants.WINNING_NETWORK) * 
-			   ((double) Constants.WINNING_NETWORK))) / size * 
-			   ((double)Constants.START_BETA)); 
-		//boardCache.add(board.hashCode(), score);
+			((double) Constants.WINNING_NETWORK))) / size * 
+			((double)Constants.START_BETA));  // Normalizes the score so it is within +2 and -2.
 		return score;
 		
 	}
