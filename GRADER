@@ -58,32 +58,47 @@ Constants
 	public final class Constants{
 
 
-		//Board Constants
-		public static final BOARDHEIGHT=8; //The height of a board
-		public static final BOARDWIDTH=8; //The width of a board
+            //Board Constants
+            public static final int BOARDHEIGHT=8; //The height of a board
+            public static final int BOARDWIDTH = 8; //The width of a board
+            public static final int WINNING_NETWORK = 6; //Winning network length
 
 
-		//Player Constants
-		public static final NULL_PLAYER=0; //No player here
-		public static final BLACK=1; //Black player
-		public static final WHITE=2; //White player
+            //Player Constants
+            public static final int NULL_PLAYER=-1; //Black player
+            public static final int BLACK=0; //Black player
+            public static final int WHITE=1; //White player
 
 
-		//Game Constants
-		public static final MAX_CHIPS=10; //The maximum number of chips in the game
+            //Game Constants
+            public static final int MAX_CHIPS=10; //The maximum number of chips in the game
+
+            // Machine Player Constants
+            public static final int START_ALPHA = -2; //Minimum alpha value
+            public static final int START_BETA = 2; //Maximum beta value
 
 
-		//Debugging and misc.
-		public static final DEBUG=true; //Used to disable unwanted debug output
+            //Debugging and misc.
+            public static final boolean DEBUG=false; //Used to disable unwanted debug output
 
 		/**
 		 *
-		 *	Prints o to stdout, if DEBUG is true.
-		 *	@param o The object to be printed
+		 *  Prints o to stdout, if DEBUG is true.
+		 *  @param o The object to be printed
 		 *
 		**/
 		public static final void print(Object o);
-	}
+
+                /**
+                 *
+                 *  Tests string value of o against the string value of expected
+                 *  and stops the program on fail with an error message.
+                 *  Used exclusively for debugging purposes.
+                 *  @param expected The expected value
+                 *  @param o The object to be tested
+                 *
+                **/
+                public static final void printTest(Object expected, Object o);
 
 DList Module
 ===========
@@ -96,82 +111,82 @@ public class DList<T>{
 	public DList();
 
         /**
-         *      Figures out if the function is a boolean or not.
-         *      @return a boolean stating if Dlist is empty or not.
-         */
+         *  Figures out if the function is a boolean or not.
+         *  @return a boolean stating if Dlist is empty or not.
+        **/
 	public boolean isEmpty();
 
 
         /**
-         *      Pushes the object to th front.
-         *      @param T is item being pushed to the front.
-         */
+         *  Pushes the object to th front.
+         *  @param T is item being pushed to the front.
+        **/
 	public void pushFront(T item);
 
         /**
-         *      Pushes the object to the back.
-         *      @param T is item being pushed to the back.
-         */
+         *  Pushes the object to the back.
+         *  @param T is item being pushed to the back.
+        **/
 	public void pushBack(T item);
 
         /**
-         *      Pops the object from the front.
-         *      @return T object being popped.
+         *  Pops the object from the front.
+         *  @return T object being popped.
          */
 	public T popFront();
 
         /**
-         *      Pushes the object to the back.
-         *      @param T is item being pushed to the back.
+         *  Pushes the object to the back.
+         *  @param T is item being pushed to the back.
          */
 	public T popBack();
 
         /**
-         *      Pops the object in the back.
-         *      @param T is item being pushed to the back.
+         *  Pops the object in the back.
+         *  @param T is item being pushed to the back.
          */
 	public T pop();
 
-       /**
-         *      Gets the DListNode in the Front.
-         *      @return DListNode in the front.
-         */
+        /**
+         *  Gets the DListNode in the Front.
+         *  @return DListNode in the front.
+        **/
 	public DListNode<T> getFront();
 
         /**
-         *      Gets the object in the back.
-         *      @return DListNode in the back.
-         */
+         *  Gets the object in the back.
+         *  @return DListNode in the back.
+        **/
 	public DListNode<T> getBack();
 
         /**
-         *      Gets the item in a certain location.
-         *      @param index is the position to select from.
-         *      @return a T object at the index.
-         */
+         *  Gets the item in a certain location.
+         *  @param index is the position to select from.
+         *  @return a T object at the index.
+        **/
 	public T getItem(int index);
 
         /**
-         *      Appends two lists together.
-         *      @param d is a DList being added to the front.
-         */
+         *  Appends two lists together.
+         *  @param d is a DList being added to the front.
+        **/
 	public void appendFront(DList<T> d);
 
         /**
-         *      Appends two lists together.
-         *      @param d is a DList being added to the back.
-         */
+         *  Appends two lists together.
+         *  @param d is a DList being added to the back.
+        **/
 	public void appendBack(DList<T> d);
 
         /**
-         *      Appends two lists together.
-         *      @param d is a DList being added to the back.
-         */
+         *  Appends two lists together.
+         *  @param d is a DList being added to the back.
+        **/
 	public void append(DList<T> d);
 
         /**
-         *      Returns length of DList.
-         *      @return the size of the Dlist.
+         *  Returns length of DList.
+         *  @return the size of the Dlist.
          */
 	public int length();
 }
@@ -204,86 +219,52 @@ Board Module
 
                 /**
                  *
-                 *	Incorporates a move into the internal game board.
-                 *	@param m is the move that the board is incorporating.
-                 *	@param color is the color of the player performing the move.
-                 *	@throws InvalidMoveException when a move makes a board invalid.
+                 *  Incorporates a move into the internal game board.
+                 *  @param m is the move that the board is incorporating.
+                 *  @param color is the color of the player performing the move.
+                 *  @throws InvalidMoveException when a move makes a board invalid.
                  *
                 **/
                 public void doMove(Move m, int color) throws InvalidMoveException;
 
                 /**
                  *
-                 *	Undo a move in the internal game board. 
+                 *  Undo a move in the internal game board. 
                  *
-                 *	NEVER CALL BEFORE CALLING Board.doMove() WITH THE MOVE FIRST! 
-                 *	Board.doMove() MUST NOT THROW AN EXCEPTION. FAILURE TO ADHERE 
-                 *	TO THIS WILL CAUSE VIOLATION OF INVARIANTS.
-                 *
-                 *	@param m is the move that the board is incorporating.
-                 *	@param color is the color of the player performing the move.
-                 *	@throws InvalidMoveException when a move makes a board invalid.
+                 *  NEVER CALL BEFORE CALLING Board.doMove() WITH THE MOVE FIRST! 
+                 *  Board.doMove() MUST NOT THROW AN EXCEPTION. FAILURE TO ADHERE 
+                 *  TO THIS WILL CAUSE VIOLATION OF INVARIANTS.
+                 *  @param m is the move that the board is incorporating.
+                 *  @param color is the color of the player performing the move.
+                 *  @throws InvalidMoveException when a move makes a board invalid.
                  *
                 **/
                 public void undoMove(Move m, int color) throws InvalidMoveException;
 
-                /**
-                 *
-                 *	Moves chip c to point x,y
-                 *	@param x1,x2 the coordinates of the chip to be moved.
-                 *	@param x1,x2 the coordinates of the chip's destination.
-                 *	@param color the color of the player placing the chip
-                 *	@throws InvalidMoveException when a move makes a board invalid.
-                 *
-                **/
-                public void moveChip(int x1, int y1, int x2, int y2, int color) throws InvalidMoveException{
 
                 /**
                  *
-                 *	Creates chip at x,y.
-                 *	@param color the color of the chip to be
-                 *		   created
-                 *	@param x the destination x coordinate
-                 *	@param x the destination x coordinate
-                 *	@param y the destination y coorinate
+                 *  Gets the chip at x,y.
+                 *  @param x the target x coordinate
+                 *  @param y the target y coordinate
+                 *  @return the Chip at x,y, or null if there is no chip.
                  *
                 **/
-                public void addChip(int color, int x, int y) throws InvalidMoveException{
-
-		/**
-		 *
-		 *	Gets the chip at x,y.
-		 *	@param x the target x coordinate
-		 *	@param y the target y coordinate
-		 *	@throws ChipNotFoundException if there is no chip at x,y
-		 *	@return the Chip at x,y
-		 *
-		**/
 		public Chip getChip(int x, int y) throws ChipNotFoundException;
 
-                /**
-                 *
-                 *	Removes chip at x,y.
-
-                 *	@param x the x coordinate
-                 *	@param y the y coordinate
-                 *      @return the chip.
-                 *
-                **/
-                public void removeChip(int x, int y);
-
+               
 		/**
 		 *
-		 *	Tells whether a chip at x,y exists
-		 *	@param x the target x coordinate
-		 *	@param y the target y coordinate
-		 *	@return whether there is a chip at x,y
+		 *  Tells whether a chip at x,y exists
+		 *  @param x the target x coordinate
+		 *  @param y the target y coordinate
+		 *  @return whether there is a chip at x,y
 		 *
 		**/
 		public boolean hasChip(int x, int y);
 
                 /**
-                *       @return the the number of black chips on the board
+                 *  @return the the number of black chips on the board
                 **/
                 public int numBlack();
 
@@ -292,67 +273,6 @@ Board Module
                 **/
                 public int numWhite();
 
-                /**
-                 *
-                 *	Tells whether a chip at x,y exists
-                 *	@param x the target x coordinate
-                 *	@param y the target y coordinate
-                 *	@return whether there is a chip at x,y
-                 *
-                **/
-                public boolean hasChip(int x, int y);
-
-                /**
-                 *
-                 *	Returns whether this Chip a is line of sight with Chip b
-                 *	@param x1,y1 are the coordinates of the chip of reference.
-                 *	@param x2,y2 are the coordinates of the chip for comparison
-                 *	@return whether the chip is line of sight with b
-                 *
-                **/
-                public boolean isLOS(int x1,int x2,int y1,int y2);
-
-	
-                /**
-                 *      Returns whether the board is full or not. This is when 10 white chips
-                 *      and 10 black chips are on the field.
-                 *      @return whether the board is full or not.
-                 * 
-                 **/
-                public boolean isFull();
-
-                /**
-                 *
-                 *	Returns whether chip 1 interrupts the path between chips 2 and 3.
-                 *	@param x1, y1 the reference chip
-                 *	@param x2, y2 the second chip
-                 *	@param x3, y3 the third chip
-                 *	@return whether this chip is between 2 and 3.
-                 *
-                **/
-                public boolean isInterruptPath(int x1, int y1, int x2, int y2, int x3, int y3);
-
-                /**
-                 *
-                 * Checks for valid chip location.
-                 * 4 rules:
-                 * 1. Cannot place chips in corners.
-                 * 2. Cannot place in wrong goal.
-                 * 3. Cannot place three in contact with each other.
-                 * @return boolean that states if the chip location is valid.
-                 *
-                **/
-                public boolean isValid();
-
-                /**
-                 *
-                 *	Returns the number of same-color neighbors this chip has.
-                 *      @param x refers to the x-coordinate.
-                 *      @param y refers to the y coordinate.
-                 *	@returns the number of neighbors of this chip's color.
-                 *
-                **/
-                private int getSameColorNeighbors(int x, int y);
 
                 /**
                  *
@@ -372,90 +292,52 @@ Board Module
                  public String toString();
 
                 /**
-                 * 
-                 * @return the key of the object.
-                **/
-                public String getKey();
-
-                /**
                  *
                  * Returns a list of the longest networks.
                  * @return a DList of networks
                  *
                 **/
-                public DList<Net> getLongestNetworks()'
+                public DList<Net> getLongestNetworks();
 
-             
-                /**
-                 *
-                 * Finds the longest network.
-                 * @param x is x value of the chip.
-                 * @param y is the y value of the chip.
-                 * @param last_direction is the last_direction the chip went in.
-                 * @param depth is referring to how far the object goes down.
-                 * @param origin_x is referring to the x-coordinate the original goal was in.
-                 * @param origin_y is referring to the y-coordinate the original goal was in.
-                 * @return a DList of networks
-                 *
-                **/
-                private DList<Net> expandLongestNetFromChip(int x, int y, int last_direction, int depth, int origin_x, int origin_y);
-
-                /**
-                 *
-                 * Returns a hashcode based on base3.
-                 * @return a DList of networks
-                 *
-                **/
-
-                public int hashCode();
-
-		/**
-		 *
-		 * Returns whether the game is over.
-		 * @return the color of the winning player, or Constants.NULL_PLAYER if the game is not over.
-		 *
-		**/
-		public int isGameOver();
 	}
 
 	/**
 	 *
-	 *	The chip ADT represents a single chip on the board.
-	 *	Each chip knows its position on the board.
+	 *  The chip ADT represents a single chip on the board.
+	 *  Each chip knows its position on the board.
 	 *
 	**/
 	public class Chip{
 
 		/**
 		 *
-		 *	Constructs a new chip on board b.
-		 *	@param b specifies the board that the chip belongs to
-		 *	@throws InvalidChipException when 
+		 *  Constructs a new chip on board b.
+		 *  @param b specifies the board that the chip belongs to
+		 *  @throws InvalidChipException when 
 		 *
 		**/
 		public Chip(Board b, color c, int x, int y) throws InvalidChipException;
 
 		/**
 		 *
-		 *	Get the color of the chip
-		 *	@return the color of the chip, defined in Constants
+		 *  Get the color of the chip
+		 *  @return the color of the chip, defined in Constants
 		 *
 		**/
-
 		public int getColor();
 
 	}
 
 	/**
 	 *
-	 *	An exception thrown when an invalid move is attempted.
+	 *  An exception thrown when an invalid move is attempted.
 	 *
 	**/
 	public class InvalidMoveException extends Exception{
                 /**
-                 *	An exception thrown when an invalid move is attempted.
-                 *      Prints out message msg.
-                 *      @param message msg to return.
+                 *  An exception thrown when an invalid move is attempted.
+                 *  Prints out message msg.
+                 *  @param message msg to return.
                 **/
                 public class InvalidMoveException(String msg);
        }                 
@@ -471,6 +353,12 @@ AI Module
 	 *  
 	**/
 	public class MachinePlayer extends Player{
+
+                /** 
+                 * Creates a machine player with the given color.	
+                 * Color is either 0 (black) or 1 (white). (White has the first move.)
+                **/ 
+                public MachinePlayer(int color);
 
 		/**
 		 *
@@ -517,35 +405,7 @@ AI Module
                  * @param beta The variable being compared with.
                  * @param depth The depth the project is searching through.
                  * @return if move valid or not.
-                **/
-                private Best chooseBestMove(int currColor, double alpha, double beta, int depth);
-                
-                /**
-                 * Finds all of the moves or one color.
-                 * @param myColor color of current player in beta.
-                 * @return A list of moves.
-                **/
-                private DList<Move> getAllMoves(int myColor);
-
-                /**
-                 * Scores the board.
-                 * @param depth it's checking for.
-                 * @return the score of the move.
-                **/
-                private double scoreBoard(int depth);
-
-                /**
-                 * Gets the color of the opponent.
-                 * @param the color of the object now.
-                 * @return the color of opponent.
-                **/
-                private int getOppColor(int c);
-                
-               /**
-                * Object that stores the best move.
-               **/
-                class Best;
-
+                **/                              
 	}
 
 

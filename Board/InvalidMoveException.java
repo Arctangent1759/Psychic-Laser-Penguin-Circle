@@ -4,14 +4,14 @@ package Board;
 public class InvalidMoveException extends Exception{
     	/**
 	 *
-	 *	An exception thrown when a player attempts to create a chip at an invalid location
+	 *	An exception thrown when an invalid move is attempted.
 	 *
 	**/
 	public InvalidMoveException(){
 		super();
 	}
         /**
-	 *	An exception thrown when a player attempts to create a chip at an invalid location
+	 *	An exception thrown when an invalid move is attempted.
          *      Prints out message msg.
          *      @param message msg to return.
 	**/
